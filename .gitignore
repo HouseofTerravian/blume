@@ -1,0 +1,6 @@
+node_modules/
+dist/
+vaults/
+exports/
+.env
+*.local
