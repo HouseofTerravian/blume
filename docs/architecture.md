@@ -140,6 +140,8 @@ BLUME uses the same Supabase project as `terravian-mcp`. Tables relevant to BLUM
 
 These boundaries are locked. Any future feature must be assigned to an owner before implementation begins. When in doubt, BLUME owns generation and storage; terravian-mcp owns execution and routing.
 
+See `docs/boundaries.md` for the full ownership spec: what each system owns, what is temporarily duplicated, what must be migrated, and what must never be duplicated again.
+
 | Responsibility                          | Owner                                  |
 | --------------------------------------- | -------------------------------------- |
 | Content generation                      | **BLUME**                              |
