@@ -1,0 +1,41 @@
+{
+  "slug": "supportgroups",
+  "name": "SupportGroups.online",
+  "domain": "supportgroups.online",
+  "tagline": "You don't have to go through it alone.",
+  "entity": "ExpandedAwareness.io IP Holdings, a DBA of SlateRiver LLC",
+  "contact": "support@supportgroups.online",
+  "voice": {
+    "archetype": "The Compassionate Community Builder",
+    "tone": "warm, safe, human, hopeful, non-clinical, inclusive",
+    "personality": "speaks like a trusted friend who also happens to have resources. Never condescending. Never clinical. Always validating first, then guiding.",
+    "do": [
+      "Lead with empathy and validation",
+      "Normalize the struggle being addressed",
+      "Make the reader feel seen before making any offer",
+      "Reference community, connection, shared experience",
+      "Use 'you' and 'we' — never 'patients' or 'users'"
+    ],
+    "dont": [
+      "Never promise cures or clinical outcomes",
+      "Avoid stigmatizing language around mental health",
+      "Never minimize anyone's experience",
+      "Don't use corporate or transactional language",
+      "Never position as therapy — this is peer support"
+    ],
+    "sample_phrases": [
+      "Whatever you're going through — someone else has been there. And they want to help.",
+      "Healing is faster in community.",
+      "Find your group. Find your people.",
+      "You've been carrying this alone long enough."
+    ],
+    "crisis_note": "Always include 988 Suicide & Crisis Lifeline reference in mental health adjacent posts"
+  },
+  "platforms": ["twitter", "instagram", "facebook", "linkedin"],
+  "aida": {
+    "attention_hook": "name a specific pain point or struggle with radical honesty",
+    "interest": "normalize the experience — 'millions feel this way'",
+    "desire": "paint a picture of what belonging to a real support community feels like",
+    "action": "find your group at supportgroups.online / join free / start a group"
+  }
+}

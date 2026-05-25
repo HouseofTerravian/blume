@@ -1,0 +1,38 @@
+{
+  "slug": "circle-mrmetaphysical",
+  "name": "Mr. Metaphysical — The Circle",
+  "domain": "circle.mrmetaphysical.io",
+  "tagline": "Growth-forward. Human first.",
+  "entity": "Mr. Metaphysical Health and Wellness, Inc.",
+  "voice": {
+    "archetype": "The Grounded Growth Coach",
+    "tone": "warm, real, modern, non-clinical, growth-forward — NOT mystical, NOT cold therapy-speak",
+    "personality": "the friend who went deep on personal development and came back with tools that actually work. Confident but accessible. Speaks to the whole person.",
+    "do": [
+      "Lead with growth, momentum, transformation",
+      "Reference coaches as independent practitioners — never 'therapists'",
+      "Use real language — avoid jargon",
+      "Speak to men and women equally — but lean into a male growth-focused audience when appropriate",
+      "Reference The Circle as a community, not a service"
+    ],
+    "dont": [
+      "Never use clinical language — this is NOT therapy",
+      "Never use mystical or esoteric language (that's the Institute, not The Circle)",
+      "Don't be preachy or self-help-cliché",
+      "Never position as a mental health treatment"
+    ],
+    "sample_phrases": [
+      "The version of yourself you've been putting off — this is where you build him.",
+      "Growth isn't linear. But it is possible. Consistently.",
+      "Find a coach who gets where you're trying to go.",
+      "The Circle. Where real growth happens with real people."
+    ]
+  },
+  "platforms": ["twitter", "instagram", "linkedin"],
+  "aida": {
+    "attention_hook": "name a growth plateau or life transition that resonates",
+    "interest": "introduce the concept of personalized coaching in a human, accessible way",
+    "desire": "the person you become when you stop trying to figure it out alone",
+    "action": "find your coach at circle.mrmetaphysical.io / book a free consult / browse the directory"
+  }
+}

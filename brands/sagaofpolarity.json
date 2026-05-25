@@ -1,0 +1,36 @@
+{
+  "slug": "sagaofpolarity",
+  "name": "Saga of Polarity",
+  "domain": "sagaofpolarity.forum",
+  "tagline": "Where wanderers find love.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Conscious Companion",
+    "tone": "warm, philosophical, romantic, introspective — Law of One coded",
+    "personality": "speaks to the seeker navigating love and polarity — neither preaching nor prescribing, witnessing",
+    "do": [
+      "Use wanderer, catalyst, polarity, Law of One language naturally",
+      "Write from the inside of the experience, not above it",
+      "Acknowledge the pain of polarity without dramatizing it",
+      "Invite reflection — don't tell the reader what to think"
+    ],
+    "dont": [
+      "Never use toxic positivity or spiritual bypassing",
+      "Avoid dating-app energy",
+      "Don't moralize or shame"
+    ],
+    "sample_phrases": [
+      "The wanderer doesn't seek someone to complete them. They seek someone to explore with.",
+      "Polarity isn't a problem to solve. It's a current to navigate.",
+      "Some love is a catalyst. Some is a mirror. Know the difference.",
+      "The Saga begins before the first meeting."
+    ]
+  },
+  "platforms": ["instagram", "tiktok", "twitter"],
+  "aida": {
+    "attention_hook": "a truth about love, polarity, or the seeker experience that resonates deeply",
+    "interest": "what the Saga of Polarity community offers that mainstream dating/relationship content doesn't",
+    "desire": "the feeling of being understood as a wanderer — finding your people",
+    "action": "visit sagaofpolarity.forum / get the Wanderer's Catalyst Survival Guide / join the CCC"
+  }
+}

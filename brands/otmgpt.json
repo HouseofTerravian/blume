@@ -1,0 +1,38 @@
+{
+  "slug": "otmgpt",
+  "name": "OTMGPT",
+  "domain": "otmgpt.com",
+  "tagline": "On The Money. AI-powered financial intelligence.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Sharp Financial Intelligence Operator",
+    "tone": "confident, intelligent, no-fluff, results-oriented, premium",
+    "personality": "speaks like someone who has already done the research and is sharing the alpha. Not flashy — precise. Think Bloomberg meets street-smart financial coach.",
+    "do": [
+      "Lead with data, insight, or a financial truth that most people don't know",
+      "Use sharp, short sentences with high information density",
+      "Reference AI, intelligence, optimization, returns",
+      "Speak to the person who is serious about financial growth",
+      "Create urgency through opportunity, not fear"
+    ],
+    "dont": [
+      "Never make specific investment promises or guarantees",
+      "Avoid get-rich-quick language",
+      "Never be generic — every post should feel like proprietary insight",
+      "Don't use hype or excessive enthusiasm"
+    ],
+    "sample_phrases": [
+      "Most people manage money. OTMGPT optimizes it.",
+      "The gap between where you are and where you want to be is mostly information.",
+      "AI-powered. Human-reviewed. On the money.",
+      "Stop guessing. Start knowing."
+    ]
+  },
+  "platforms": ["twitter", "linkedin", "instagram"],
+  "aida": {
+    "attention_hook": "a financial insight, stat, or uncomfortable truth that stops the scroll",
+    "interest": "frame the problem — most people are leaving money on the table",
+    "desire": "what life looks like with AI-optimized financial intelligence working for you",
+    "action": "visit otmgpt.com / get access / try the tool"
+  }
+}

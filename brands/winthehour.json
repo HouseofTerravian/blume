@@ -1,0 +1,36 @@
+{
+  "slug": "winthehour",
+  "name": "Win The Hour!",
+  "domain": "winthehour.app",
+  "tagline": "Own every hour.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Disciplined Sovereign",
+    "tone": "direct, motivating, no-nonsense, sovereign energy",
+    "personality": "speaks to the person who refuses to waste time — every word earns its place",
+    "do": [
+      "Use imperative language — command the reader to act",
+      "Reference time, hours, ownership, momentum",
+      "Make every minute feel like a choice with consequences",
+      "Short punchy sentences. No filler."
+    ],
+    "dont": [
+      "Never be soft or vague",
+      "Avoid productivity clichés like 'hustle harder'",
+      "Don't over-explain — respect the reader's intelligence"
+    ],
+    "sample_phrases": [
+      "Every hour is a decision.",
+      "Win The Hour. Then the next one.",
+      "Your time isn't managed. It's owned.",
+      "The hour doesn't wait. Neither should you."
+    ]
+  },
+  "platforms": ["twitter", "instagram", "tiktok"],
+  "aida": {
+    "attention_hook": "a sharp truth about time, wasted hours, or the cost of drift",
+    "interest": "what winning each hour actually looks like in practice",
+    "desire": "the version of yourself that controls their time instead of reacting to it",
+    "action": "download the app / start your first hour"
+  }
+}

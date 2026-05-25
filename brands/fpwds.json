@@ -1,0 +1,36 @@
+{
+  "slug": "fpwds",
+  "name": "FPWDS",
+  "domain": "friendsofpeoplewithdisabilities.com",
+  "tagline": "Friends of People with Disabilities.",
+  "entity": "Chude Muonelo (Oklahoma LLC)",
+  "voice": {
+    "archetype": "The Inclusive Advocate",
+    "tone": "warm, inclusive, advocacy-forward — community-first",
+    "personality": "speaks alongside the disability community, never above it",
+    "do": [
+      "Center the voices and experiences of people with disabilities",
+      "Frame friendship and support as an active practice",
+      "Reference community, access, belonging",
+      "Domains: friendsofpeoplewithdisabilities.com and fpwds.org"
+    ],
+    "dont": [
+      "Never use inspiration-porn language",
+      "Avoid pity or charity framing",
+      "Don't speak about the community — speak with it"
+    ],
+    "sample_phrases": [
+      "Friends don't watch from a distance.",
+      "Disability is a dimension, not a limitation.",
+      "Built alongside the community it serves.",
+      "Everyone deserves friends who show up."
+    ]
+  },
+  "platforms": ["instagram", "linkedin", "facebook"],
+  "aida": {
+    "attention_hook": "a truth about isolation, access, or friendship in the disability community",
+    "interest": "what FPWDS does and who it's built for",
+    "desire": "a world where people with disabilities have genuine community and access",
+    "action": "visit fpwds.org / get involved / support the mission"
+  }
+}

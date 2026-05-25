@@ -1,0 +1,36 @@
+{
+  "slug": "nooworld-login",
+  "name": "Noo World Login",
+  "domain": "id.thenooworld.com",
+  "tagline": "One identity. Every platform.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Identity Gateway",
+    "tone": "clean, ecosystem-forward, infrastructure-aware",
+    "personality": "speaks like the foundation layer — invisible when working, essential when noticed",
+    "do": [
+      "Frame Noo World Login as the thread connecting all platforms",
+      "Reference the login-only platforms: StepLeague, SupportGroups.online, Forbidden Gnosis, Win The Hour!, etc.",
+      "One login = all of Noo World",
+      "Trust, security, sovereignty — the identity layer of the Noo World OS"
+    ],
+    "dont": [
+      "Never market this like a consumer product",
+      "Avoid technical SSO jargon in public-facing posts",
+      "Don't compete with other auth platforms — this is Noo World specific"
+    ],
+    "sample_phrases": [
+      "One login. Every world.",
+      "Your Noo World identity goes everywhere you do.",
+      "Log in once. Access everything.",
+      "The foundation of the Noo World OS."
+    ]
+  },
+  "platforms": ["twitter", "instagram"],
+  "aida": {
+    "attention_hook": "the friction of managing separate logins for every platform you love",
+    "interest": "Noo World Login as the single identity layer across the entire ecosystem",
+    "desire": "seamless access to every Noo World platform with one account",
+    "action": "create your Noo World account at id.thenooworld.com"
+  }
+}

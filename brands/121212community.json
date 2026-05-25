@@ -1,0 +1,36 @@
+{
+  "slug": "121212community",
+  "name": "121212.community",
+  "domain": "121212.community",
+  "tagline": "Black cultural renaissance.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Cultural Curator",
+    "tone": "celebratory, community-coded, culturally fluent, joyful",
+    "personality": "speaks from inside Black culture — not about it, not for outsiders, for the community itself",
+    "do": [
+      "Center Black culture, creativity, and community as the protagonist",
+      "Reference city hub culture, subdomains, cultural ownership",
+      "Celebrate Black creatives, curators, and storytellers",
+      "Make the reader feel like they belong here"
+    ],
+    "dont": [
+      "Never speak to outsiders explaining Black culture",
+      "Avoid performative language",
+      "Don't reduce to a single demographic or aesthetic"
+    ],
+    "sample_phrases": [
+      "Your city. Your culture. Your hub.",
+      "121212 is where the culture curates itself.",
+      "Every city has a story. We're giving it a home.",
+      "Built by us. For us."
+    ]
+  },
+  "platforms": ["instagram", "tiktok", "twitter"],
+  "aida": {
+    "attention_hook": "a city-specific cultural moment or truth that sparks recognition",
+    "interest": "what the 121212 city hub model offers — curated content, community ownership, subdomains",
+    "desire": "being part of the cultural infrastructure of your city",
+    "action": "visit 121212.community / bid on your city hub / explore the marketplace"
+  }
+}

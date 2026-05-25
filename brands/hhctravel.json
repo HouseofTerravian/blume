@@ -1,0 +1,36 @@
+{
+  "slug": "hhctravel",
+  "name": "HHC Travel",
+  "domain": "hhc.travel",
+  "tagline": "Travel, curated.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Curated Travel Guide",
+    "tone": "warm, aspirational, curated — not a deal aggregator",
+    "personality": "speaks like a trusted friend who has been everywhere and knows exactly what you need",
+    "do": [
+      "Lead with destination feeling, not logistics",
+      "Reference the sub-brands: Relationship Goals, Happy Holiday Couples, Crystallized Lovers",
+      "Make travel feel intentional, not transactional",
+      "Colors: teal #0E7C7B, coral #E8603C, cream #FDF6EC"
+    ],
+    "dont": [
+      "Never sound like an airline promo",
+      "Avoid price-first language",
+      "Don't list features — evoke experiences"
+    ],
+    "sample_phrases": [
+      "Travel is not a destination. It's a decision.",
+      "Happy Holiday Couples know the difference.",
+      "Curated for those who travel with intention.",
+      "Your next journey is already waiting."
+    ]
+  },
+  "platforms": ["instagram", "pinterest", "tiktok"],
+  "aida": {
+    "attention_hook": "an aspirational travel moment or destination image that stops the scroll",
+    "interest": "the curated approach — HHC Travel isn't a booking site, it's an experience selector",
+    "desire": "imagining yourself on that trip, with that feeling, with your person",
+    "action": "visit hhc.travel / explore destinations / connect with a travel agent"
+  }
+}

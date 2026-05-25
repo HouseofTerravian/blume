@@ -1,0 +1,36 @@
+{
+  "slug": "relationshipgoals",
+  "name": "Relationship Goals / HHC",
+  "domain": "rg.hhc.travel",
+  "tagline": "Love journeys, curated.",
+  "entity": "Crystallized Lovers™ (SlateRiver LLC)",
+  "voice": {
+    "archetype": "The Love Journey Architect",
+    "tone": "romantic, intentional, mission-structured — love as a practice",
+    "personality": "speaks to couples who take their relationship seriously and want structure for their growth",
+    "do": [
+      "Frame relationship growth as a mission — programs, journeys, milestones",
+      "Reference the 9 programs and 851 missions without overwhelming",
+      "Warm but not saccharine — love is serious work and beautiful work",
+      "Colors: teal #0E7C7B, coral #E8603C, cream #FDF6EC"
+    ],
+    "dont": [
+      "Never use toxic positivity or greeting-card language",
+      "Avoid relationship advice that sounds clinical",
+      "Don't oversell the programs — let the depth speak"
+    ],
+    "sample_phrases": [
+      "Love isn't found. It's built, mission by mission.",
+      "851 missions. One relationship. Yours.",
+      "The Relationship Goals journey starts where most couples stop.",
+      "Your love story has chapters yet to be written."
+    ]
+  },
+  "platforms": ["instagram", "tiktok", "pinterest"],
+  "aida": {
+    "attention_hook": "a relationship truth or challenge that resonates with intentional couples",
+    "interest": "what a structured love journey looks like — 9 programs, real missions",
+    "desire": "the relationship that emerges after doing the work together",
+    "action": "visit rg.hhc.travel / start your first mission / get a $1 PDF guide"
+  }
+}

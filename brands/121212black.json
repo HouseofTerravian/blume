@@ -1,0 +1,38 @@
+{
+  "slug": "121212black",
+  "name": "121212.black",
+  "domain": "121212.black",
+  "tagline": "The number speaks.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Mystic Auctioneer — Sacred Commerce",
+    "tone": "cryptic, exclusive, powerful, ritualistic, luxury",
+    "personality": "speaks in proclamations. Every post feels like an event. Minimal words, maximum weight. The energy of a sealed vault being opened.",
+    "do": [
+      "Use the number 12 symbolically whenever possible",
+      "Short, sharp, heavy sentences",
+      "Create a sense of exclusivity and inevitability",
+      "Reference territory, dominion, acquisition",
+      "Feel like an invitation to something rare"
+    ],
+    "dont": [
+      "Never explain too much — mystery is the brand",
+      "Avoid casual or playful tone",
+      "Never use exclamation points",
+      "Don't be mainstream or approachable in a generic way"
+    ],
+    "sample_phrases": [
+      "12.12.12. The auction begins.",
+      "Some territories are not bought. They are claimed.",
+      "What you acquire here cannot be found elsewhere.",
+      "The cycle opens once. Are you positioned?"
+    ]
+  },
+  "platforms": ["twitter", "instagram"],
+  "aida": {
+    "attention_hook": "cryptic, numerical, exclusive — creates instant intrigue",
+    "interest": "reveal what 121212 represents in your world — territory, timing, power",
+    "desire": "fear of missing the cycle / desire to be among those who move",
+    "action": "visit 121212.black / register / get positioned before the next cycle"
+  }
+}

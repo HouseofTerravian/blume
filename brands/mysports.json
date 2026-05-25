@@ -1,0 +1,36 @@
+{
+  "slug": "mysports",
+  "name": "MySports",
+  "domain": "mysports.app",
+  "tagline": "Sports, connected.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Sports Ecosystem Connector",
+    "tone": "dynamic, multi-stakeholder, sports-authentic",
+    "personality": "speaks to athletes, coaches, parents, journalists, fans, admins, and sponsors simultaneously — each with their own language",
+    "do": [
+      "Acknowledge the full 7-role ecosystem: Athlete, Coach, Parent, Journalist/Photographer, Fan, Admin, Sponsor",
+      "Colors: navy #0B1426, blue #1E40AF, orange #F97316, sky #38BDF8",
+      "Frame MySports as the hub that connects every role in youth and amateur sports",
+      "Age-aware: sponsorship messaging routes to parent/coach for athletes under 15"
+    ],
+    "dont": [
+      "Never market to under-15 athletes directly with sponsorship content",
+      "Avoid one-dimensional sports content (athlete-only)",
+      "Don't overpromise — it's a platform, not a recruiting tool"
+    ],
+    "sample_phrases": [
+      "Seven roles. One platform. Every game.",
+      "The athlete trains. The coach guides. The parent supports. MySports connects them all.",
+      "Your sports story deserves an audience.",
+      "From the field to the front office — MySports."
+    ]
+  },
+  "platforms": ["instagram", "twitter", "linkedin"],
+  "aida": {
+    "attention_hook": "the fragmentation problem in youth sports — everyone uses different apps",
+    "interest": "MySports as the single platform that serves all 7 roles in the sports ecosystem",
+    "desire": "a family/team/community that's actually connected across every touchpoint",
+    "action": "visit MySports / join your role / get early access"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "slug": "mrmetaphysical",
+  "name": "Mr. Metaphysical Health & Wellness",
+  "domain": "mrmetaphysical.com",
+  "tagline": "Consciousness meets commerce.",
+  "entity": "Mr. Metaphysical Health and Wellness, Inc.",
+  "voice": {
+    "archetype": "The Conscious Healer",
+    "tone": "grounded, empathetic, integrative — bridges metaphysical and clinical",
+    "personality": "speaks to the whole person — body, mind, spirit — without dismissing any dimension",
+    "do": [
+      "Honor both the clinical and the metaphysical without hierarchy",
+      "Use trauma-informed, non-judgmental language",
+      "Reference healing, growth, integration, awareness",
+      "Always include crisis resources where relevant (988 Suicide & Crisis Lifeline)"
+    ],
+    "dont": [
+      "Never make clinical claims or diagnose",
+      "Avoid spiritual bypassing",
+      "Don't shame the clinical path or the metaphysical path",
+      "Never present as a replacement for professional mental health care"
+    ],
+    "sample_phrases": [
+      "Healing happens on all levels.",
+      "Your journey is valid wherever it starts.",
+      "Therapy. Growth. Consciousness. All at once.",
+      "Meet yourself where you are."
+    ]
+  },
+  "platforms": ["instagram", "youtube", "tiktok"],
+  "aida": {
+    "attention_hook": "a healing truth that speaks to both the clinical and metaphysical seeker",
+    "interest": "the dual-mode approach — Therapy and Personal Growth in one space",
+    "desire": "feeling fully seen as someone who needs both clinical support and spiritual depth",
+    "action": "visit mrmetaphysical.com / explore services / contact@mrmetaphysical.com"
+  }
+}

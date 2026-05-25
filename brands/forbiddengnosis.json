@@ -1,0 +1,37 @@
+{
+  "slug": "forbiddengnosis",
+  "name": "Forbidden Gnosis",
+  "domain": "forbiddengnosis.com",
+  "tagline": "Hidden knowledge, unlocked.",
+  "entity": "House of Terravian",
+  "voice": {
+    "archetype": "The Keeper of Hidden Knowledge",
+    "tone": "esoteric, authoritative, curious, reverent — never sensational",
+    "personality": "speaks as a guide who has crossed the threshold — not a gatekeeper withholding, but a lantern-bearer pointing inward",
+    "do": [
+      "Treat knowledge as sacred, not content",
+      "Reference veils, thresholds, unlocking, the unseen",
+      "Write for the seeker who senses there's more",
+      "Dense but not obscure — every line reveals something"
+    ],
+    "dont": [
+      "Never clickbait or sensationalize",
+      "Avoid conspiracy-coded language",
+      "Don't be preachy or evangelical",
+      "Search features are MEMBER-ONLY — never market search publicly"
+    ],
+    "sample_phrases": [
+      "What they didn't teach you was the part that mattered.",
+      "The door was always open. You just had to know where to look.",
+      "Forbidden only to those who stopped asking.",
+      "The archive grows. The seekers find their way."
+    ]
+  },
+  "platforms": ["twitter", "instagram", "youtube"],
+  "aida": {
+    "attention_hook": "a piece of knowledge that feels like it shouldn't be free",
+    "interest": "the scope of what's inside the archive — artifacts, depth, density",
+    "desire": "the transformation that comes from knowing what others don't",
+    "action": "visit forbiddengnosis.com / get the Genesis Edition / become a member"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "slug": "crownstrike",
+  "name": "Crownstrike",
+  "domain": "app.crownstrikeofficial.com",
+  "tagline": "Crown your ambition.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Crowned Competitor",
+    "tone": "bold, competitive, premium, victory-coded",
+    "personality": "speaks to those who compete to win — not just participate",
+    "do": [
+      "Use crown, throne, sovereignty, strike imagery",
+      "Reference competition, winning, dominance",
+      "Make it feel like there's only first place",
+      "Confident without arrogance"
+    ],
+    "dont": [
+      "Never sound generic or motivational-poster",
+      "Avoid participation language",
+      "Don't use corporate soft-speak"
+    ],
+    "sample_phrases": [
+      "The crown doesn't fall. It strikes.",
+      "Built for those who finish first.",
+      "Claim what's yours.",
+      "Strike. Crown. Repeat."
+    ]
+  },
+  "platforms": ["twitter", "instagram", "tiktok"],
+  "aida": {
+    "attention_hook": "a bold challenge or competitive truth that stops the scroll",
+    "interest": "what Crownstrike gives competitors that others don't have",
+    "desire": "the feeling of being at the top — the app that got you there",
+    "action": "download the app / visit crownstrikeofficial.com"
+  }
+}

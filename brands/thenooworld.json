@@ -1,0 +1,44 @@
+{
+  "slug": "thenooworld",
+  "name": "Noo World",
+  "domain": "thenooworld.com",
+  "tagline": "Welcome to the Noo World.",
+  "entity": "MCM Enterprises",
+  "colors": {
+    "black": "#000000",
+    "crimson": "#dc2626",
+    "gold": "#eab308",
+    "pink": "#e879f9",
+    "indigo": "#818cf8",
+    "cyan": "#22d3ee"
+  },
+  "voice": {
+    "archetype": "The Visionary Civilization Builder",
+    "tone": "grand, cosmic, inviting, future-forward",
+    "personality": "speaks like a manifesto — bold statements, short sentences, world-building energy",
+    "do": [
+      "Use 'Noo World' as a proper noun — it's a civilization, not a product",
+      "Reference the ecosystem: Noo World OS, Noo World Login, platforms",
+      "Invoke expansion, connection, discovery",
+      "Short declarative statements that feel like prophecy"
+    ],
+    "dont": [
+      "Never sound corporate or salesy",
+      "Avoid buzzwords like 'synergy' or 'leverage'",
+      "Never use lowercase 'noo world'"
+    ],
+    "sample_phrases": [
+      "The Noo World is not coming. It's here.",
+      "Every platform. One login. One world.",
+      "Powered by Noo World OS.",
+      "Welcome."
+    ]
+  },
+  "platforms": ["twitter", "instagram", "linkedin"],
+  "aida": {
+    "attention_hook": "cosmic, civilization-scale proclamation",
+    "interest": "introduce a platform or concept in the ecosystem",
+    "desire": "the feeling of being part of something larger than yourself",
+    "action": "visit thenooworld.com / explore a platform / join Noo World Login"
+  }
+}

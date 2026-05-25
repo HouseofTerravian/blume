@@ -1,0 +1,36 @@
+{
+  "slug": "mmhw-institute",
+  "name": "Mr. Metaphysical — The Global Wellness Institute",
+  "domain": "institute.mrmetaphysical.io",
+  "tagline": "This Is Not Therapy.",
+  "entity": "Mr. Metaphysical Health and Wellness, Inc.",
+  "voice": {
+    "archetype": "The Dark Regal Alchemist",
+    "tone": "dark, regal, private-pay premium — sovereign energy, not clinical",
+    "personality": "speaks to the high-performer who has outgrown conventional therapy and wants transformation at a different level",
+    "do": [
+      "Lean into the 'This Is Not Therapy' positioning — it's transformation",
+      "Premium, private, exclusive — this is not for everyone",
+      "Reference alchemy, transformation, the Institute as a higher-order container",
+      "Dark and regal aesthetics — bg #0E0818, purple #6B3FA0, gold #D4AF37"
+    ],
+    "dont": [
+      "Never soften the premium positioning",
+      "Avoid clinical language entirely",
+      "Don't make it accessible — this is intentionally exclusive"
+    ],
+    "sample_phrases": [
+      "This Is Not Therapy. This Is Transformation.",
+      "The Institute does not heal wounds. It dissolves them.",
+      "Private. Precise. Permanent.",
+      "For those who have done the work and know there's more."
+    ]
+  },
+  "platforms": ["instagram", "linkedin"],
+  "aida": {
+    "attention_hook": "the sharp distinction between therapy and transformation — 'This Is Not Therapy'",
+    "interest": "what The Global Wellness Institute offers that conventional settings can't",
+    "desire": "the transformation available only at this level of work",
+    "action": "visit institute.mrmetaphysical.io / apply / admin@mrmetaphysical.io"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "slug": "stepleague",
+  "name": "StepLeague",
+  "domain": "stepleague.online",
+  "tagline": "Gamified step competition.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Fitness Game Master",
+    "tone": "competitive, playful, health-coded — fitness meets gaming",
+    "personality": "speaks to people who want health accountability wrapped in competition",
+    "do": [
+      "Frame steps as points, wins, and league standings",
+      "Reference competition, leagues, rankings, streaks",
+      "Make fitness feel like a sport you can actually win",
+      "$10/month — frame the value as cheap for what competition gives you"
+    ],
+    "dont": [
+      "Never be preachy about health",
+      "Avoid wellness-spa-tone completely",
+      "Don't over-explain the mechanics"
+    ],
+    "sample_phrases": [
+      "Every step is a point. Every point is a win.",
+      "The league doesn't care how you feel. It cares how far you walked.",
+      "Your competition is already moving.",
+      "Step. Compete. Win."
+    ]
+  },
+  "platforms": ["instagram", "tiktok", "twitter"],
+  "aida": {
+    "attention_hook": "a competitive fitness truth — most people walk alone, StepLeague makes it a sport",
+    "interest": "what the league structure looks like — rankings, competitions, monthly cycles",
+    "desire": "the feeling of winning a fitness competition and holding the top spot",
+    "action": "visit stepleague.online / join the league / $10/month"
+  }
+}

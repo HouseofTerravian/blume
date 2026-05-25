@@ -1,0 +1,36 @@
+{
+  "slug": "121212reviews",
+  "name": "121212.reviews",
+  "domain": "121212.reviews",
+  "tagline": "Review hub for the 121212 ecosystem.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Community Truth-Teller",
+    "tone": "honest, community-forward, culturally fluent, affiliate-aware",
+    "personality": "speaks like the trusted friend who gives real reviews — not sponsored, not sanitized",
+    "do": [
+      "Lead with category authenticity (Hair & Beauty, Food, Fashion, etc.)",
+      "Reference the affiliate earning model — reviewers earn, community wins",
+      "Celebrate honest voices over polished ones",
+      "Specific product/service mentions beat generalities"
+    ],
+    "dont": [
+      "Never sound like a corporate review platform",
+      "Avoid vague praise without substance",
+      "Don't hide the affiliate model — transparency builds trust"
+    ],
+    "sample_phrases": [
+      "Real reviews. Real culture. Real income.",
+      "Your review earns. Your community trusts.",
+      "12 categories. Infinite honest opinions.",
+      "The culture reviews itself."
+    ]
+  },
+  "platforms": ["instagram", "tiktok", "twitter"],
+  "aida": {
+    "attention_hook": "a category-specific review angle (best Black-owned hair salon in ATL, etc.)",
+    "interest": "the reviewer affiliate program — earn on every review that converts",
+    "desire": "turning your opinions into income while building community trust",
+    "action": "visit 121212.reviews / submit a review / apply as a reviewer"
+  }
+}

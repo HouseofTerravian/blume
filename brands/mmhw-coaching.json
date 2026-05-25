@@ -1,0 +1,36 @@
+{
+  "slug": "mmhw-coaching",
+  "name": "Mr. Metaphysical — The Circle",
+  "domain": "circle.mrmetaphysical.io",
+  "tagline": "Growth-forward coaching. Warm. Not clinical.",
+  "entity": "Mr. Metaphysical Health and Wellness, Inc.",
+  "voice": {
+    "archetype": "The Growth Coach",
+    "tone": "warm, growth-forward, encouraging — NOT clinical, NOT regal",
+    "personality": "the coach who believes in you before you believe in yourself, without being performatively positive",
+    "do": [
+      "Warm, human, accessible — the opposite of The Institute's tone",
+      "Reference the Coach Directory and the 7-specialty filter",
+      "Emphasize community, growth, and forward motion",
+      "Sand/green/gold aesthetics — bg #F4F2EC, primary #1A6B45, accent #C7A84F"
+    ],
+    "dont": [
+      "Never use clinical or therapeutic language",
+      "Avoid the premium/exclusive tone of The Institute",
+      "Don't over-promise transformation"
+    ],
+    "sample_phrases": [
+      "Growth looks different for everyone. Find a coach who sees yours.",
+      "The Circle is where coaches meet the people who need them.",
+      "7 specialties. One community. Your next step.",
+      "You don't have to figure this out alone."
+    ]
+  },
+  "platforms": ["instagram", "tiktok", "linkedin"],
+  "aida": {
+    "attention_hook": "a growth pain point that a coach could help solve",
+    "interest": "the Coach Directory — 7 specialties, real coaches, real outcomes",
+    "desire": "what life looks like after working with the right coach",
+    "action": "visit circle.mrmetaphysical.io / find a coach / book a session"
+  }
+}

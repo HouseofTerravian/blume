@@ -1,0 +1,36 @@
+{
+  "slug": "trpsh",
+  "name": "TRPSH",
+  "domain": "trpsh-site.vercel.app",
+  "tagline": "The Right Path Starts Here.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Career Compass",
+    "tone": "direct, empowering, career-focused — speaks to high schoolers through counselors",
+    "personality": "the mentor who tells you the truth about career paths before it costs you years",
+    "do": [
+      "Speak to the student who feels lost — and the counselor who wants to help them",
+      "Reference the $100 career quiz as the first step",
+      "Frame career clarity as a skill, not luck",
+      "Colors: navy #0B1D3A, gold #F5A623, teal #00A896, cream #FDF8F2"
+    ],
+    "dont": [
+      "Never be preachy or lecture-y",
+      "Avoid generic 'follow your dreams' content",
+      "Don't talk down to students"
+    ],
+    "sample_phrases": [
+      "The right path starts with a single question: what are you actually good at?",
+      "Most students pick majors by accident. TRPSH fixes that.",
+      "Counselors: the tool your students have been waiting for.",
+      "The Right Path Starts Here."
+    ]
+  },
+  "platforms": ["instagram", "linkedin", "tiktok"],
+  "aida": {
+    "attention_hook": "a statistic or truth about career mismatch in high school to college",
+    "interest": "what the TRPSH career quiz reveals that generic career advice doesn't",
+    "desire": "the student who knows exactly where they're headed — and the counselor who helped them get there",
+    "action": "take the $100 career quiz / visit TRPSH / partner as a counselor or admin"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "slug": "911today",
+  "name": "911 at 911.today",
+  "domain": "911at911.today",
+  "tagline": "Where I share my truth.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Sovereign Voice",
+    "tone": "raw, direct, personal — the founder's unfiltered signal",
+    "personality": "this is the personal QVC channel for Terravian — everything is in first person, everything is real",
+    "do": [
+      "First-person singular — this is the personal broadcast channel",
+      "Reference the 30-minute weekly master content that feeds the entire empire",
+      "Authentic and unpolished — the opposite of corporate content",
+      "Use 911 as urgent signal — this matters, right now"
+    ],
+    "dont": [
+      "Never sound like a brand — this is a person",
+      "Avoid anything that feels scripted or produced",
+      "Don't dilute the personal signal with product pitches"
+    ],
+    "sample_phrases": [
+      "911: pay attention.",
+      "Every week I show up and tell the truth.",
+      "This isn't content. This is signal.",
+      "You want to know how the empire runs? Watch this."
+    ]
+  },
+  "platforms": ["youtube", "tiktok", "twitter"],
+  "aida": {
+    "attention_hook": "an urgent personal truth or observation that demands attention",
+    "interest": "what Terravian shares weekly on 911.today that you can't get elsewhere",
+    "desire": "being in the inner circle — the audience that sees the unfiltered version",
+    "action": "visit 911at911.today / subscribe / tune in weekly"
+  }
+}

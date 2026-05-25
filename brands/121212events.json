@@ -1,0 +1,36 @@
+{
+  "slug": "121212events",
+  "name": "121212.events",
+  "domain": "121212.events",
+  "tagline": "Curated Black cultural events.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Cultural Concierge",
+    "tone": "excited, specific, community-warm, insider-coded",
+    "personality": "the friend who always knows about the best events before everyone else",
+    "do": [
+      "Lead with city, date, vibe — specific beats generic",
+      "Name-drop the culture (ATL, Chi, DC, Houston, Miami, NOLA, Detroit)",
+      "Make the reader feel they'll miss something if they don't act",
+      "Celebrate the artists, organizers, and community behind events"
+    ],
+    "dont": [
+      "Never be generic — always specific to a city or event type",
+      "Avoid ticket-platform language",
+      "Don't list events without personality"
+    ],
+    "sample_phrases": [
+      "Atlanta's next cultural moment is already on the calendar.",
+      "Seven cities. Twenty-four events. One community.",
+      "The culture doesn't wait for you to find it.",
+      "Submit your event. Own your city's story."
+    ]
+  },
+  "platforms": ["instagram", "tiktok", "twitter"],
+  "aida": {
+    "attention_hook": "a specific city event or cultural happening that triggers FOMO",
+    "interest": "the breadth of 121212.events across 7 cities and 12 categories",
+    "desire": "never missing a cultural moment in your city again",
+    "action": "visit 121212.events / RSVP / submit your event"
+  }
+}

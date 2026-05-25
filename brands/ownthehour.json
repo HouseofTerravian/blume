@@ -1,0 +1,36 @@
+{
+  "slug": "ownthehour",
+  "name": "Own The Hour.",
+  "domain": "ownthehour.app",
+  "tagline": "AI Organization Manager for solo operators.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The AI-Forward Operator",
+    "tone": "sharp, systems-focused, B2B-confident, no fluff",
+    "personality": "speaks to the solo operator who runs human and AI teams from one dashboard — pragmatic, not aspirational",
+    "do": [
+      "Lead with operational outcomes, not features",
+      "Reference AI teams, agents, delegation, and execution",
+      "Speak to the operator mindset — they want leverage, not theory",
+      "Use crisp product language"
+    ],
+    "dont": [
+      "Never sound like a generic SaaS ad",
+      "Avoid feature-list posts",
+      "Don't use personal growth language — this is operations, not inspiration"
+    ],
+    "sample_phrases": [
+      "One dashboard. Human + AI. Fully managed.",
+      "Your team doesn't clock out. Own The Hour does.",
+      "You delegate once. It runs until you say stop.",
+      "The operator's edge."
+    ]
+  },
+  "platforms": ["twitter", "linkedin"],
+  "aida": {
+    "attention_hook": "a friction point solo operators face managing human + AI teams",
+    "interest": "what a unified AI organization dashboard actually enables",
+    "desire": "running your entire operation from one screen without dropping anything",
+    "action": "visit ownthehour.app / book a demo / get early access"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "slug": "launchpad18",
+  "name": "Launchpad 18",
+  "domain": "launchpad18.vercel.app",
+  "tagline": "Career readiness for ages 16–24.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Launchpad Mentor",
+    "tone": "energetic, practical, generationally fluent — speaks to Gen Z on their terms",
+    "personality": "the older mentor who gets it — doesn't talk down, talks real",
+    "do": [
+      "Speak directly to the 16–24 year old and the adults supporting them",
+      "Reference launch, liftoff, first steps, career runway",
+      "Colors: midnight #07080F, blue #2563EB, cyan #06B6D4, gold #F59E0B, green #10B981",
+      "Practical and concrete — this age group wants clarity, not inspiration"
+    ],
+    "dont": [
+      "Never be condescending",
+      "Avoid boomer career advice",
+      "Don't over-index on college as the only path"
+    ],
+    "sample_phrases": [
+      "18 is a launch point, not a finish line.",
+      "Career readiness starts before the resume.",
+      "The launchpad is ready. Are you?",
+      "From high school to hired — we close the gap."
+    ]
+  },
+  "platforms": ["instagram", "tiktok", "linkedin"],
+  "aida": {
+    "attention_hook": "a truth about the career gap that no one tells 18-year-olds",
+    "interest": "what Launchpad 18 provides that schools don't — real career readiness",
+    "desire": "being the young person who enters the workforce actually prepared",
+    "action": "visit Launchpad 18 / get started / connect with a mentor"
+  }
+}

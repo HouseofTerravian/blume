@@ -1,0 +1,38 @@
+{
+  "slug": "crystallizedlovers",
+  "name": "Crystallized Lovers™",
+  "domain": "crystallizedlovers.com",
+  "tagline": "Love, crystallized.",
+  "entity": "MCM Enterprises",
+  "voice": {
+    "archetype": "The Intimate Relationship Whisperer",
+    "tone": "warm, sensual, psychologically deep, healing, honest",
+    "personality": "speaks to the private self — the person at 2am wondering if their relationship can be saved or if they deserve more. Soft but piercing.",
+    "do": [
+      "Speak directly to the couple or the individual in pain",
+      "Use relationship psychology language made accessible",
+      "Invoke the feeling of being truly understood",
+      "Build desire by naming the transformation, not the product",
+      "Feminine-leaning energy but speaks to all partners"
+    ],
+    "dont": [
+      "Never be preachy or lecture-y",
+      "Avoid clinical, cold, or detached language",
+      "Never shame anyone's relationship history",
+      "Don't use generic 'relationship tips' energy"
+    ],
+    "sample_phrases": [
+      "The version of love you've been dreaming of — it's learnable.",
+      "What if you stopped settling for connection and started experiencing it?",
+      "Your love story isn't over. It's waiting to be rewritten.",
+      "Crystallize what you already have. Or build what you deserve."
+    ]
+  },
+  "platforms": ["twitter", "instagram", "tiktok"],
+  "aida": {
+    "attention_hook": "a raw, honest truth about relationships that stops the scroll",
+    "interest": "psychological insight that reframes how they see their situation",
+    "desire": "vision of the relationship transformation available to them",
+    "action": "visit crystallizedlovers.com / book a session / join the community"
+  }
+}
