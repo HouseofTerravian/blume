@@ -136,13 +136,38 @@ BLUME uses the same Supabase project as `terravian-mcp`. Tables relevant to BLUM
 
 ---
 
+## Architectural Boundaries (Canonical)
+
+These boundaries are locked. Any future feature must be assigned to an owner before implementation begins. When in doubt, BLUME owns generation and storage; terravian-mcp owns execution and routing.
+
+| Responsibility                          | Owner                                  |
+| --------------------------------------- | -------------------------------------- |
+| Content generation                      | **BLUME**                              |
+| Listing generation                      | **BLUME**                              |
+| Brand / site analysis                   | **BLUME**                              |
+| Vault record storage                    | **BLUME**                              |
+| Public signal ingestion                 | **BLUME**                              |
+| Multi-agent system orchestration        | **Terravian-MCP / TerravianHQ**        |
+| Cross-system job scheduling             | **Terravian-MCP**                      |
+| Social posting via OAuth / STEALTHAPI   | **STEALTHAPI / Terravian-MCP bridge**  |
+| Final execution routing                 | **Terravian-MCP / HQ**                 |
+
+### What this means in practice
+
+- BLUME **never** posts to social platforms directly.
+- BLUME **never** runs the op queue daemon — it only creates tasks for the daemon to execute.
+- BLUME **never** subscribes to events — it only emits them.
+- BLUME **never** schedules jobs — it hands output to the queue and stops.
+- Terravian-MCP **never** generates content, SEO copy, or vault entries — it delegates all generation to BLUME.
+
+---
+
 ## Relationship with terravian-mcp
 
 BLUME is the brain. terravian-mcp is the hands.
 
 ```
 terravian-mcp
-    ├── BLUME MCP tools (currently duplicated — will import from blume package in Phase 2)
     ├── Scheduler daemon (thq_blume_queue)
     ├── Op queue daemon (thq_op_queue) — executes tasks BLUME creates
     ├── Event subscription router
@@ -152,7 +177,8 @@ terravian-mcp
 blume (this repo)
     ├── Content generation engine
     ├── SEO generation
-    ├── Festival pipeline (creates tasks, daemon executes)
+    ├── Signal ingestion (Phase 2)
+    ├── Festival + listing pipelines (creates tasks, daemon executes)
     ├── Brand registry
     ├── Vault system
     └── Standalone MCP server

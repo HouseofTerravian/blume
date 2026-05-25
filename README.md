@@ -146,21 +146,23 @@ Run `npm run mcp` to start the standalone BLUME MCP server. Available tools:
 
 ---
 
-## Relationship with terravian-mcp
+## Architectural Boundaries
 
-BLUME is the **generation** layer. `terravian-mcp` is the **publishing and orchestration** layer.
+These are locked. BLUME owns generation and storage. terravian-mcp owns execution and routing.
 
-| Responsibility | Lives in |
-|---|---|
-| Content generation | `blume` |
-| SEO generation | `blume` |
-| Festival pipeline | `blume` |
-| Brand registry | `blume` |
-| Vault archive | `blume` |
-| Post scheduling daemon | `terravian-mcp` |
-| Social posting (STEALTHAPI gateway) | `terravian-mcp` |
-| Op queue daemon | `terravian-mcp` |
-| Event system | `terravian-mcp` |
+| Responsibility                        | Owner                                 |
+| ------------------------------------- | ------------------------------------- |
+| Content generation                    | **BLUME**                             |
+| Listing generation                    | **BLUME**                             |
+| Brand / site analysis                 | **BLUME**                             |
+| Vault record storage                  | **BLUME**                             |
+| Public signal ingestion               | **BLUME**                             |
+| Multi-agent system orchestration      | **Terravian-MCP / TerravianHQ**       |
+| Cross-system job scheduling           | **Terravian-MCP**                     |
+| Social posting via OAuth / STEALTHAPI | **STEALTHAPI / Terravian-MCP bridge** |
+| Final execution routing               | **Terravian-MCP / HQ**                |
+
+See `docs/architecture.md` for the full boundary rules and "what this means in practice."
 
 ---
 
