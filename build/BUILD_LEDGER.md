@@ -58,7 +58,13 @@
 
 ## ⚠️ RE-BASELINE (2026-06-19) — BLUME is ALREADY BUILT, not greenfield
 This ledger was first drafted assuming a blank slate. **Coverage audit (`COVERAGE_REPORT_v1.md`) proved otherwise:** two working MCP servers exist — **`blume/` = BLUME-MCP** (generation, 8 CORE vaults, 26 brands, search, festivals) and **`terravian-mcp/` = Terravian-MCP** (BLUME adapter, social gateway, scheduler+daemon, events, queue, workflows, observability, approvals). The doctrine's BLUME-MCP↔Terravian-MCP split is **real and mid-migration** (`terravian-mcp/src/adapters/blume.ts` → `@terravian/blume`).
-**So `BLUME-001` (scaffold server) is OBSOLETE.** True Wave-1 order: **BLUME-004 (reconcile) → BLUME-005 (voice cleanup) → S4 Lotus (040–043, the real missing keystone) → S1/S2 artifact+router-tag spine → BLUME-032 (8→12 vaults).** Lotus + the artifact/router-tag spine are the genuine gaps; most "infra" is built (S20–S27).
+**So `BLUME-001` (scaffold server) is OBSOLETE.** True Wave-1 order: **BLUME-004 (reconcile) → BLUME-005 (voice cleanup) → S1/S2 artifact+router-tag spine → S4 Lotus (040–043) → BLUME-032 (8→12 vaults).** Lotus + the artifact/router-tag spine are the genuine gaps; most "infra" is built (S20–S27).
+
+**📐 ACTIVE SPECS (build-ready, no further doctrine phase needed):**
+- **`build/ARTIFACT_SPINE_SPEC_v1.md`** — S1/S2. Defines Artifact + Router-Tag contract, `thq_artifacts` + `thq_vault_registry`, 8 MCP tools, migration from legacy `VaultEntry`. **Build BEFORE Lotus** (Lotus reads it).
+- **`build/LOTUS_ENGINE_SPEC_v1.md`** — S4. C/A/O/P/M scoring → Launch Readiness Index + bands, Health Bar, missing-evidence/bottleneck/Tick Maps, 8 MCP tools. Reads artifacts via the Spine; owns no truth.
+
+**🗄️ STORAGE FACT (corrected from code):** live Supabase tables use the **`thq_` prefix** (`thq_vault_entries`, `thq_op_queue`, `thq_events`, `thq_festivals`) — **not** `blume_*`/`sapi_*`. New spine/Lotus tables follow: `thq_artifacts`, `thq_vault_registry`, `thq_lotus_config`, `thq_readiness_snapshots`. Also: code vault integers (1=published-works…) are **permuted vs doctrine** (1=Brand Assets…) — the registry keys on **slug**, integers are legacy-compat only.
 
 ---
 

@@ -16,11 +16,13 @@
 
 **Done when:** the ledger's Master Task Table reflects true as-built status, and the Lotus + artifact-spine gaps are confirmed as the next real build targets.
 
-**Then, in order:**
+**Then, in order (Spine BEFORE Lotus — Lotus reads the Spine):**
 1. **BLUME-005** — retire public `dominion_rex`/`venus_protocol` modes → private; set calm-premium house voice default.
-2. **★ S4 Lotus Engine (BLUME-040 → 043)** — the real missing keystone: C/A/O/P/M scoring → Launch Readiness Index → `readiness(brand)`.
-3. **S1/S2 Artifact + Router-Tag spine** (BLUME-003/010/011/020/021) — the canonical artifact contract the vaults currently lack.
+2. **★ S1/S2 Artifact + Router-Tag spine** (BLUME-003/010/011/020/021) — per **`build/ARTIFACT_SPINE_SPEC_v1.md`**. The canonical `thq_artifacts` contract the vaults currently lack (no uuid/switch/version/source/hash today).
+3. **★ S4 Lotus Engine** (BLUME-040 → 043) — per **`build/LOTUS_ENGINE_SPEC_v1.md`**. C/A/O/P/M scoring → Launch Readiness Index → `lotus_readiness(brand)`. Reads artifacts via the Spine.
 4. **BLUME-032** — vault enum migration 8→12 (add 9 R&D, 11 Memory, 12 Library; 10 Compliance parked).
+
+**Both specs are build-ready — no further doctrine phase required.**
 
 **One-time build-start confirms (still open with Chude):**
 1. Where Lotus lives — extend `blume/` (BLUME-MCP) — confirmed direction; verify.
