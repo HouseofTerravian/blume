@@ -38,10 +38,13 @@
 | S10 | Investor Engine (Vault 8) | BLUME-MCP | Investor readiness artifacts |
 | S11 | Search Engine | BLUME-MCP | Query/retrieval across artifacts |
 | S12 | Audit Engine | BLUME-MCP | Proof-of-commerce, immutable log |
-| S13 | Publishing Engine | shared | StealthAPI/social → proof-of-use |
+| S13 | Publishing & Distribution | shared | Publish + schedule (social/email) → proof-of-use |
 | S14 | Identity Integration | shared | Noo World auth; trustee roles |
 | S15 | Terravian-MCP Integration | Terravian-MCP | Routing + ownership/permission |
 | S16 | Observability / Ops | BLUME-MCP | Logging, health, visibility |
+| S17 | Content & Copywriting Engine | BLUME-MCP | Generate marketing copy/content (posts, emails, pages, ads) |
+| S18 | Voice / Persona Engine | BLUME-MCP | BLUME's **voices** — selectable tones/personas + A/B voice testing |
+| S19 | Campaign Engine | BLUME-MCP | Assemble content into campaigns + performance scoreboard + ad budget |
 
 ---
 
@@ -125,6 +128,21 @@ Every task belongs to **exactly one** wave.
 | BLUME-170 | 5 | S4 | Performance: batch scoring across many brands | 041,121 | TODO |
 | BLUME-171 | 5 | S4 | Caching/recompute strategy for readiness | 042 | TODO |
 | BLUME-180 | 5 | S3 | Compliance vault (PARKED pending Sep–Dec 2026 review; may fold → Operations/Systems) | 031 | PARKED |
+| BLUME-200 | 4 | S17 | Content generation core: produce content artifact (post/email/page/ad copy) for brand+switch → ingests as artifact | 090,021 | TODO |
+| BLUME-201 | 4 | S17 | Channel formats: social post · email · landing copy · ad copy | 200 | TODO |
+| BLUME-202 | 4 | S17 | Generated content → Creative Drafts vault; on publish → Published Works/Proof-of-Use | 201,031 | TODO |
+| BLUME-210 | 4 | S18 | Voice/Persona library + schema (house voices + style archetypes — see ARCHITECTURE "Voices" note) | 200 | TODO |
+| BLUME-211 | 4 | S18 | Tone selection: apply chosen voice to content generation | 210,200 | TODO |
+| BLUME-212 | 4 | S18 | A/B/n voice testing: generate variants in N voices, tag for comparison | 211 | TODO |
+| BLUME-213 | 4 | S18 | Voice performance → which voice converts (Copywriting Campaign Tracker) → feeds Lotus/Sales Health | 212,041 | TODO |
+| BLUME-214 | 4 | S18 | BLUME house voice (elegant/clever/confident; calm-premium — NO public "Mystic-Tech") as default | 210 | TODO |
+| BLUME-220 | 4 | S19 | Campaign model: group content across channels, tied to switches | 201,090 | TODO |
+| BLUME-221 | 4 | S19 | Campaign performance tracker (scoreboard: impressions/clicks/conv/revenue by voice & channel) | 220,041 | TODO |
+| BLUME-222 | 5 | S19 | Ad budget tracker (micro-budget $5–$50 tests) | 220 | TODO |
+| BLUME-223 | 5 | S19 | Email sequence builder | 201 | TODO |
+| BLUME-224 | 5 | S19 | Landing page generation | 201 | TODO |
+| BLUME-152 | 5 | S13 | Social scheduling + posting | 150,201 | TODO |
+| BLUME-153 | 5 | S13 | Multi-channel distribution (social + email) | 152,223 | TODO |
 
 ---
 

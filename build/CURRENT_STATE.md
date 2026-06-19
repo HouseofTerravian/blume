@@ -3,7 +3,7 @@
 
 ## HANDOFF — 2026-06-19
 Current State : **Wave 0 → 1 boundary.** Doctrine locked; Build Ledger v1 created. No build code yet.
-Completed     : Doctrine (Q-1/Q-2/Q-3) + Build Ledger v1 (`BUILD_LEDGER.md`). See `COMPLETED.md`.
+Completed     : Doctrine (Q-1/Q-2/Q-3) + Build Ledger v1 — **20 systems, 71 tasks** (incl. marketing layer: S17 Content, S18 **Voices**, S19 Campaign; S13 broadened to Publishing & Distribution). See `COMPLETED.md`.
 In Progress   : none
 Blocked       : none
 Next Task     : **BLUME-001** — scaffold the BLUME-MCP server (see `NEXT_ACTION.md`)
