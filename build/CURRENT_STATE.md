@@ -7,8 +7,10 @@ Completed     : Doctrine (Q-1/Q-2/Q-3) + Build Ledger v1 + **Coverage Report v1*
 In Progress   : none
 Blocked       : none
 Next Task     : **BLUME-004** — reconcile the two existing servers vs ledger (see `NEXT_ACTION.md`). Then BLUME-005 (voice cleanup) → **S4 Lotus (040–043)** → S1/S2 artifact+router-tag spine → BLUME-032 (8→12 vaults).
+Specs ready  : **`build/ARTIFACT_SPINE_SPEC_v1.md`** (S1/S2) + **`build/LOTUS_ENGINE_SPEC_v1.md`** (S4) — build-ready, no further doctrine phase needed. Build order: **Spine → Lotus**.
 Known Risks   :
-  - **Genuine missing keystones: ★ Lotus Engine (S4) + the Artifact/Router-Tag spine (S1/S2)** — these don't exist yet; everything else is mostly built.
+  - **Genuine missing keystones: ★ the Artifact/Router-Tag spine (S1/S2) THEN Lotus Engine (S4)** — these don't exist yet; everything else is mostly built. (Spine first — Lotus reads it.)
+  - Storage prefix is **`thq_*`** (not blume_*/sapi_*); code vault integers permuted vs doctrine → registry keys on slug.
   - Doctrine-debt: public `dominion_rex`/`venus_protocol` modes still in generation tools (BLUME-005).
   - Voice RULED 6.19.26: public default = Calm·Premium·Intelligent·Helpful·Strategic; Mystic-Tech = private only; no real copywriter names.
   - In-flight `@terravian/blume` package migration (`terravian-mcp/src/adapters/blume.ts` baby bridge) — finish the split, don't fork.
