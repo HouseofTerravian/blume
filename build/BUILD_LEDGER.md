@@ -92,7 +92,7 @@ Every task belongs to **exactly one** wave.
 | ID | Wave | Sys | Task (done-criteria) | Deps | Status |
 |----|------|-----|----------------------|------|--------|
 | ~~BLUME-001~~ | 1 | S0 | ~~Scaffold BLUME-MCP server~~ — **OBSOLETE: server already runs (`blume/src/mcp/server.ts`)** | — | DONE |
-| ⭐ BLUME-004 | 1 | S0 | **Reconcile** the two existing servers (`blume/` + `terravian-mcp/`) against this ledger; mark BUILT systems DONE/ADOPT; document the in-flight `@terravian/blume` migration | — | TODO |
+| ⭐ BLUME-004 | 1 | S0 | **Reconcile** the two existing servers against this ledger; mark statuses; document `@terravian/blume` migration | — | **DONE** (see §5b Reconciliation Result) |
 | ⭐ BLUME-005 | 1 | S18 | **Doctrine-debt:** retire public `dominion_rex`/`venus_protocol` modes → private-only; set calm-premium house voice (Calm·Premium·Intelligent·Helpful·Strategic) as default | 004 | TODO |
 | ⭐ BLUME-002 | 1 | S0 | Connect storage substrate (Supabase `wxinipsficonhfifjqek`, `blume_*`/`sapi_*`) — write+read a row | 001 | TODO |
 | ⭐ BLUME-003 | 1 | S0 | Minimal data model: `artifact(uuid,brand,vault,switch,title,ts,version,source,hash,metadata jsonb)` — migration applied (dev) | 002 | TODO |
@@ -176,6 +176,46 @@ Every task belongs to **exactly one** wave.
 | BLUME-237 | — | S27 | Signals — `blume/src/signals` (define scope) | — | PARTIAL |
 
 > **As-built status overlay (from `COVERAGE_REPORT_v1.md`):** also already BUILT (mark on next pass): S0 scaffold · S6 switch model (BLUME-090) · S7 flat brand registry (BLUME-120 partial — needs owner→holding hierarchy) · S11 search (vault-based, not artifact) · S16 logging/health (BLUME-062/063) · S17 generation (BLUME-200/201). **Genuinely MISSING keystones:** ★ **S4 Lotus Engine (040–043)** · **S1/S2 Artifact+Router-Tag spine** · S5 Recommendation · S8 Memory / S9 Library vaults.
+
+---
+
+## 5b. BLUME-004 — Reconciliation Result (verified by code, 2026-06-19)
+*Authoritative system-level status. Verdicts: **BUILT · PARTIAL · MISSING · OBSOLETE.** Verified via `blume/src/mcp/server.ts`, `terravian-mcp/src/server.ts` tool surface, repo globs, and grep (no `lotus|readiness|score`; no artifact/router-tag contract).*
+
+| Sys | Verdict | Evidence / what's there vs. missing |
+|-----|---------|-------------------------------------|
+| S0 Foundation | **BUILT** | Both MCP servers run (`blume/src/mcp/server.ts`, `terravian-mcp/src/server.ts`). |
+| S1 Artifact Engine | **MISSING** | No artifact module. `VaultEntry` lacks uuid/switch/version/source/hash. |
+| S2 Router-Tag Engine | **MISSING** | No router-tag contract/validator (grep clean). |
+| S3 Vault Engine | **PARTIAL** | 8 CORE vaults built (files + `thq_vault_entries`). Missing 9 R&D / 11 Memory / 12 Library; integers permuted vs doctrine (→ BLUME-032). |
+| S4 Lotus Engine | **MISSING** | ★ No scoring/readiness/health anywhere. The primary objective. |
+| S5 Recommendation | **MISSING** | Only `blume_diagnose_switch` point-advice; no readiness-driven "what next". |
+| S6 Sales Switch | **PARTIAL** | `content/switches.ts` + `blume_diagnose_switch` built. Switch→vault map + LUME/BLUME split not formalized. |
+| S7 Brand Engine | **PARTIAL** | Flat 26-brand registry + add/remove. No owner→holding hierarchy. |
+| S8 Memory (V11) | **MISSING** | Sovereign vault absent (only 8 vaults). |
+| S9 Library (V12) | **MISSING** | Sovereign vault absent. |
+| S10 Investor (V8) | **PARTIAL** | Vault 8 stores entries; no readiness/deck generation (needs Lotus). |
+| S11 Search | **BUILT** | `vault_search` (vault-based, not artifact-based). |
+| S12 Audit | **PARTIAL** | Vault append/logging only; no hash chain / immutability / versioning. |
+| S13 Publishing & Distribution | **BUILT** | Social gateway, `blume_tweet`/`blume_post`, scheduler + auto-fire daemon, bulk schedule. |
+| S14 Identity | **MISSING/STUB** | `nooworld-login` brand JSON only; no MCP auth / trustee roles. |
+| S15 Terravian-MCP Routing | **PARTIAL** | Routing *mechanics* (queue/events/workflows) built; **ownership/permission model (SlateRiver→TFT/TDT) MISSING.** |
+| S16 Observability | **BUILT** | `system_health`, `failure_feed`, `analytics_summary`. |
+| S17 Content & Copywriting | **BUILT** | post / AIDA / offer / email / SEO / analyze-site. *(Generates, but does not yet ingest as artifacts — blocked on S1/S2.)* |
+| S18 Voice / Persona | **PARTIAL** | Per-brand voice built. **Doctrine-debt:** public `dominion_rex`/`venus_protocol` modes present (→ BLUME-005). No voice library / A-B. |
+| S19 Campaign | **PARTIAL** | AIDA sequence only; no campaign model / scoreboard / ad-budget. |
+| S20 Event Bus | **BUILT** | `event_emit/list/subscribe` (`terravian-mcp/src/events`). |
+| S21 Job Queue & Daemon | **BUILT** | `op_task_*`, `queue_list`, handlers (vault/social/festival/affiliate/email). |
+| S22 Workflow Engine | **BUILT** | `workflow_run/list/status`. |
+| S23 Approval / HITL | **BUILT** | `approval_queue/respond` + `human_loop` flag on generation. |
+| S24 Listings | **PARTIAL** | Festivals pipeline BUILT (`festival_sync/list`); **apartments = types only.** |
+| S25 Affiliate | **PARTIAL** | `queue/handlers/affiliate.ts` exists; not wired to a product flow. |
+| S26 Social Gateway | **BUILT** | Multi-platform abstraction; **Twitter live, others phased/stub.** |
+| S27 Signals | **PARTIAL** | `blume/src/signals` types+index only; scope undefined. |
+
+**OBSOLETE:** `BLUME-001` (scaffold server) — both servers already run.
+**In-flight migration:** `terravian-mcp` → standalone `@terravian/blume` package via `adapters/blume.ts` (baby bridge) — **only `listBrands` migrated so far;** all other BLUME tools still use local `agents/blume/`. Finish the extraction during build, don't fork.
+**Net:** the two MISSING keystones (S1/S2 Spine, S4 Lotus) are confirmed by code as the real remaining work. Almost all "infra" (S20–S27) and the generation/publishing surface are BUILT.
 
 ---
 
