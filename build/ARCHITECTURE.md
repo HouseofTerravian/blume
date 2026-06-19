@@ -43,9 +43,10 @@ A **Scoring & Readiness Framework** — NOT a vault/brand/MCP/dashboard. Above t
 ## Marketing generation & Voices (the product layer)
 BLUME does not only *score* — she **generates marketing**: copy, campaigns, emails, landing pages, ads (S17 Content, S19 Campaign). Generated content becomes an **artifact** → router-tagged → vaulted (**Creative Drafts** → **Published Works / Proof-of-Use** on publish) → **Lotus-scored** → fed back into recommendations. Generation is part of **BLUME-intelligence (Wave 4)**, NOT the doctrine spine (Wave 1).
 
-**Voices / Personas (S18) — BLUME's different voices.** BLUME writes in **selectable voices**, A/B-tested to find what converts (Copywriting Campaign Tracker → Sales Health). Required doctrine alignment:
-- **Public/enterprise default voice = calm, premium, confident** (standing rule #18). The Era-1 **"Mystic-Tech"** mode + esoteric framing are **private-only** (doctrine §C-1) — never the default or public voice.
-- Voice library = **house voices + style archetypes** (e.g. "direct-response", "long-form storyteller", "elegant brand"), **NOT real copywriters' names** as product personas (trademark / publicity-rights exposure). "In the style of <named guru>" only if explicitly cleared. **OPEN sub-decision → write an ADR when S18 (BLUME-210) is built.**
+**Voices / Personas (S18) — BLUME's different voices.** BLUME writes in **selectable voices**, A/B-tested to find what converts (Copywriting Campaign Tracker → Sales Health). **RULED (Terravian, 6.19.26):**
+- **Public default voice = Calm · Premium · Intelligent · Helpful · Strategic** (standing rule #18).
+- **"Mystic-Tech" = a private / optional / House-of-Terravian mode — NOT the default**, never public/enterprise-facing (doctrine §C-1).
+- **No real copywriter names** as personas. Voice library = **house voices + style archetypes** only (e.g. "direct-response", "long-form storyteller", "elegant brand"). No "John Carlton / Gary Halbert / Ogilvy" personas.
 
 ## Open architectural questions (do NOT pre-decide — decide at build time)
 - **Vault representation:** physical containers vs metadata-driven views. *Lean: artifacts-first / views.*

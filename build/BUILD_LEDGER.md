@@ -45,6 +45,20 @@
 | S17 | Content & Copywriting Engine | BLUME-MCP | Generate marketing copy/content (posts, emails, pages, ads) |
 | S18 | Voice / Persona Engine | BLUME-MCP | BLUME's **voices** — selectable tones/personas + A/B voice testing |
 | S19 | Campaign Engine | BLUME-MCP | Assemble content into campaigns + performance scoreboard + ad budget |
+| S20 | Event Bus | Terravian-MCP | pub/sub events (`event_emit/list/subscribe`) — **BUILT** |
+| S21 | Job Queue & Daemon | Terravian-MCP | async task queue + handlers (vault/social/festival/affiliate/email) — **BUILT** |
+| S22 | Workflow Engine | Terravian-MCP | multi-step orchestration (`workflow_run/list/status`) — **BUILT** |
+| S23 | Approval / Human-in-the-Loop | Terravian-MCP | draft→approve gate (`approval_queue/respond`, `human_loop`) — **BUILT** |
+| S24 | Listings Pipeline | BLUME-MCP | Festivals + Apartments (ingest→dedup→SEO→publish) — **BUILT (festivals)** |
+| S25 | Affiliate / Referral Tracking | shared | affiliate handler (shared w/ Delegatrix) — **PARTIAL** |
+| S26 | Social Gateway | Terravian-MCP | multi-platform posting abstraction — **BUILT (Twitter); others phased** |
+| S27 | Signals | BLUME-MCP | signal capture/processing — **PARTIAL (scope TBD)** |
+
+---
+
+## ⚠️ RE-BASELINE (2026-06-19) — BLUME is ALREADY BUILT, not greenfield
+This ledger was first drafted assuming a blank slate. **Coverage audit (`COVERAGE_REPORT_v1.md`) proved otherwise:** two working MCP servers exist — **`blume/` = BLUME-MCP** (generation, 8 CORE vaults, 26 brands, search, festivals) and **`terravian-mcp/` = Terravian-MCP** (BLUME adapter, social gateway, scheduler+daemon, events, queue, workflows, observability, approvals). The doctrine's BLUME-MCP↔Terravian-MCP split is **real and mid-migration** (`terravian-mcp/src/adapters/blume.ts` → `@terravian/blume`).
+**So `BLUME-001` (scaffold server) is OBSOLETE.** True Wave-1 order: **BLUME-004 (reconcile) → BLUME-005 (voice cleanup) → S4 Lotus (040–043, the real missing keystone) → S1/S2 artifact+router-tag spine → BLUME-032 (8→12 vaults).** Lotus + the artifact/router-tag spine are the genuine gaps; most "infra" is built (S20–S27).
 
 ---
 
@@ -71,7 +85,9 @@ Every task belongs to **exactly one** wave.
 
 | ID | Wave | Sys | Task (done-criteria) | Deps | Status |
 |----|------|-----|----------------------|------|--------|
-| ⭐ BLUME-001 | 1 | S0 | Scaffold BLUME-MCP server: transport + tool registration + `ping` (server starts, ping returns) | — | TODO |
+| ~~BLUME-001~~ | 1 | S0 | ~~Scaffold BLUME-MCP server~~ — **OBSOLETE: server already runs (`blume/src/mcp/server.ts`)** | — | DONE |
+| ⭐ BLUME-004 | 1 | S0 | **Reconcile** the two existing servers (`blume/` + `terravian-mcp/`) against this ledger; mark BUILT systems DONE/ADOPT; document the in-flight `@terravian/blume` migration | — | TODO |
+| ⭐ BLUME-005 | 1 | S18 | **Doctrine-debt:** retire public `dominion_rex`/`venus_protocol` modes → private-only; set calm-premium house voice (Calm·Premium·Intelligent·Helpful·Strategic) as default | 004 | TODO |
 | ⭐ BLUME-002 | 1 | S0 | Connect storage substrate (Supabase `wxinipsficonhfifjqek`, `blume_*`/`sapi_*`) — write+read a row | 001 | TODO |
 | ⭐ BLUME-003 | 1 | S0 | Minimal data model: `artifact(uuid,brand,vault,switch,title,ts,version,source,hash,metadata jsonb)` — migration applied (dev) | 002 | TODO |
 | ⭐ BLUME-010 | 1 | S1 | Artifact ingest tool: accept payload (title, body/ref, brand) → returns uuid | 003 | TODO |
@@ -141,8 +157,19 @@ Every task belongs to **exactly one** wave.
 | BLUME-222 | 5 | S19 | Ad budget tracker (micro-budget $5–$50 tests) | 220 | TODO |
 | BLUME-223 | 5 | S19 | Email sequence builder | 201 | TODO |
 | BLUME-224 | 5 | S19 | Landing page generation | 201 | TODO |
-| BLUME-152 | 5 | S13 | Social scheduling + posting | 150,201 | TODO |
-| BLUME-153 | 5 | S13 | Multi-channel distribution (social + email) | 152,223 | TODO |
+| BLUME-152 | 5 | S13 | Social scheduling + posting | 150,201 | **DONE** (terravian-mcp scheduler+daemon) |
+| BLUME-153 | 5 | S13 | Multi-channel distribution (social + email) | 152,223 | WIP (social done; email handler exists) |
+| BLUME-032 | 1 | S3 | **Vault enum migration 8→12**: add 9 R&D, 11 Memory, 12 Library (Sovereign); 10 Compliance PARKED. CORE 1–8 already match. | 030 | TODO |
+| BLUME-230 | — | S20 | Event Bus — adopt `terravian-mcp/src/events` | — | **DONE/ADOPT** |
+| BLUME-231 | — | S21 | Job Queue & Daemon — adopt `terravian-mcp/src/queue` + handlers | — | **DONE/ADOPT** |
+| BLUME-232 | — | S22 | Workflow Engine — adopt `terravian-mcp/src/workflows` | — | **DONE/ADOPT** |
+| BLUME-233 | — | S23 | Approval / Human-in-the-Loop — adopt `approval_queue/respond` + `human_loop` | — | **DONE/ADOPT** |
+| BLUME-234 | — | S24 | Listings Pipeline — adopt Festivals (+Apartments scaffold) | — | **DONE/ADOPT** (festivals) |
+| BLUME-235 | 5 | S25 | Affiliate / Referral Tracking — `queue/handlers/affiliate.ts` (shared w/ Delegatrix) | 231 | PARTIAL |
+| BLUME-236 | — | S26 | Social Gateway — multi-platform abstraction | — | **DONE/ADOPT** (Twitter live; others phased) |
+| BLUME-237 | — | S27 | Signals — `blume/src/signals` (define scope) | — | PARTIAL |
+
+> **As-built status overlay (from `COVERAGE_REPORT_v1.md`):** also already BUILT (mark on next pass): S0 scaffold · S6 switch model (BLUME-090) · S7 flat brand registry (BLUME-120 partial — needs owner→holding hierarchy) · S11 search (vault-based, not artifact) · S16 logging/health (BLUME-062/063) · S17 generation (BLUME-200/201). **Genuinely MISSING keystones:** ★ **S4 Lotus Engine (040–043)** · **S1/S2 Artifact+Router-Tag spine** · S5 Recommendation · S8 Memory / S9 Library vaults.
 
 ---
 
