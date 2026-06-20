@@ -4,6 +4,7 @@
  */
 
 import { think } from "../integrations/ai.js";
+import { ingestGenerated } from "./ingestGenerated.js";
 
 export interface SEOContent {
   meta_title: string;
@@ -128,11 +129,12 @@ Return a JSON object with exactly these fields:
 
   const raw = await think(system, user);
 
+  let result: SEOContent;
   try {
     const parsed = JSON.parse(stripFences(raw)) as Omit<SEOContent, "confidence">;
-    return { ...parsed, confidence: "high" };
+    result = { ...parsed, confidence: "high" };
   } catch {
-    return {
+    result = {
       meta_title: `${input.topic} | ${input.brand}`,
       meta_description: `Learn about ${input.topic} from ${input.brand}. Discover insights and resources.`,
       h1: input.topic,
@@ -145,4 +147,16 @@ Return a JSON object with exactly these fields:
       confidence: "high",
     };
   }
+
+  // Auto-create a Creative Drafts artifact (SEO/page copy) so Lotus reflects it.
+  ingestGenerated({
+    brand: input.brand,
+    title: `SEO — ${input.topic}`,
+    body: `${result.meta_title}\n${result.meta_description}\n${result.h1}\n${result.intro}`,
+    kind: "seo",
+    switch: 3, // Traffic
+    metadata: { topic: input.topic, url: input.url ?? null },
+  });
+
+  return result;
 }
