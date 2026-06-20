@@ -125,9 +125,9 @@ Every task belongs to **exactly one** wave.
 | BLUME-075 | 3 | S0 | Test suite: spine loop end-to-end | 043 | TODO |
 | BLUME-076 | 3 | S4 | Test suite: scoring correctness | 042 | TODO |
 | BLUME-077 | 3 | S0 | Backup/restore of artifact store | 003 | TODO |
-| BLUME-080 | 4 | S5 | Recommendation engine: "what next" from readiness + bottleneck + missing-evidence | 053,054 | TODO |
-| BLUME-081 | 4 | S5 | Next-best-action per Sales Switch | 080,090 | TODO |
-| BLUME-082 | 4 | S5 | Recommendations use compounded Memory learnings | 080,101 | TODO |
+| BLUME-080 | 4 | S5 | Recommendation engine: "what next" from readiness + bottleneck + missing-evidence | 053,054 | **DONE** (`recommend_next`) |
+| BLUME-081 | 4 | S5 | Next-best-action per Sales Switch | 080,090 | **DONE** (category→switch + rationale) |
+| BLUME-082 | 4 | S5 | Recommendations use compounded Memory learnings | 080,101 | TODO (blocked on Memory vault S8) |
 | BLUME-090 | 4 | S6 | Sales Switch model (7 switches) + switch→vault mapping | 030 | TODO |
 | BLUME-091 | 4 | S6 | Switch progression tracking per brand | 090,041 | TODO |
 | BLUME-092 | 4 | S6 | LUME(Switch 1)/BLUME(2–7) split handling | 090 | TODO |
@@ -189,7 +189,7 @@ Every task belongs to **exactly one** wave.
 | S2 Router-Tag Engine | **BUILT** | `src/artifacts/routerTag.ts` — full contract + `routertag_validate`; auto-assigned on ingest. |
 | S3 Vault Engine | **PARTIAL** | Legacy 8-vault store still serves `blume_*vault` tools. NEW canonical **12-slug `thq_vault_registry`** built (artifacts key on slug, integers legacy-compat). Migrating the *vault-entry tools* to 12 = BLUME-032. |
 | S4 Lotus Engine | **BUILT (readiness + guidance)** | ★ `src/lotus/` — `lotus_readiness` (C/A/O/P/M + Index + band) + **`lotus_bottleneck` + `lotus_missing_evidence`** (Wave-2 depth: score→guidance). **MILESTONE: FIRST LOTUS SCORE achieved.** Still deferred: Health Bar / Tick Maps / investor summary. |
-| S5 Recommendation | **MISSING** | Only `blume_diagnose_switch` point-advice; no readiness-driven "what next". |
+| S5 Recommendation | **BUILT** | `src/recommend/` — `recommend_next` composes Lotus (readiness+bottleneck+missing-evidence) + 7 Sales Switches → prioritized, switch-aware action plan + headline + primary action. (Memory-compounded recs BLUME-082 still blocked on S8.) |
 | S6 Sales Switch | **PARTIAL** | `content/switches.ts` + `blume_diagnose_switch` built. Switch→vault map + LUME/BLUME split not formalized. |
 | S7 Brand Engine | **PARTIAL** | Flat 26-brand registry + add/remove. No owner→holding hierarchy. |
 | S8 Memory (V11) | **MISSING** | Sovereign vault absent (only 8 vaults). |

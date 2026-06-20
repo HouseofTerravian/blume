@@ -39,6 +39,7 @@ import { listVaultRegistry } from "../artifacts/registry.js";
 import { migrateLegacyVaultEntries } from "../artifacts/migrate.js";
 import type { ArtifactSource, RouterTag } from "../artifacts/types.js";
 import { computeReadiness, getLotusConfig, detectBottleneck, detectMissingEvidence } from "../lotus/engine.js";
+import { recommend } from "../recommend/engine.js";
 
 // ─── Tool definitions ─────────────────────────────────────────────────────────
 
@@ -391,6 +392,16 @@ const TOOLS: Tool[] = [
       required: ["brand"],
     },
   },
+  // ─── Recommendation Engine (S5) — "what should happen next?" ────────────────
+  {
+    name: "recommend_next",
+    description: "BLUME's recommendation: what a brand should do next. Composes Lotus readiness + bottleneck + missing-evidence into a prioritized, Sales-Switch-aware action plan with a single headline and primary action.",
+    inputSchema: {
+      type: "object",
+      properties: { brand: { type: "string", description: "Brand slug" } },
+      required: ["brand"],
+    },
+  },
 ];
 
 // ─── Server setup ─────────────────────────────────────────────────────────────
@@ -625,6 +636,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "lotus_missing_evidence": {
         return { content: [{ type: "text", text: JSON.stringify(detectMissingEvidence(String(args.brand)), null, 2) }] };
+      }
+
+      // ─── Recommendation Engine (S5) ──────────────────────────────────────
+      case "recommend_next": {
+        return { content: [{ type: "text", text: JSON.stringify(recommend(String(args.brand)), null, 2) }] };
       }
 
       default:
