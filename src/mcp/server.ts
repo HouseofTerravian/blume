@@ -575,7 +575,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       // ─── Artifact / Router-Tag Spine (S1/S2) ─────────────────────────────
       case "artifact_ingest": {
-        const result = ingestArtifact({
+        const result = await ingestArtifact({
           brand:    String(args.brand),
           title:    String(args.title),
           body:     args.body !== undefined ? String(args.body) : undefined,
@@ -613,7 +613,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "artifact_migrate_legacy": {
-        const report = migrateLegacyVaultEntries({
+        const report = await migrateLegacyVaultEntries({
           brand:  args.brand !== undefined ? String(args.brand) : undefined,
           dryRun: args.dry_run !== false,
         });

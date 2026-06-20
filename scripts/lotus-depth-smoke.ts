@@ -14,11 +14,11 @@ ok(em.items.length === 5 && em.items.every(i => i.severity === "critical"), "emp
 
 // Seed: content saturated, audience thin, offer/proof/monetization empty.
 const B = "depth-smoke-brand";
-const ing = (vault: string, sw: number | null, n: number) => {
-  for (let i = 0; i < n; i++) ingestArtifact({ brand: B, title: `${vault}-${i}`, body: `x${i}`, vault, switch: sw ?? undefined });
+const ing = async (vault: string, sw: number | null, n: number) => {
+  for (let i = 0; i < n; i++) await ingestArtifact({ brand: B, title: `${vault}-${i}`, body: `x${i}`, vault, switch: sw ?? undefined });
 };
-ing("published-works", null, 4); // content = 20
-ing("proof-of-use", 2, 1);       // switch 2 → audience = 5 ; also proof-of-use vault → proof = 5
+await ing("published-works", null, 4); // content = 20
+await ing("proof-of-use", 2, 1);       // switch 2 → audience = 5 ; also proof-of-use vault → proof = 5
 
 const bn = await detectBottleneck(B);
 // scores: content 20, audience 5, offer 0, proof 5, monetization 0 → lowest by order = offer

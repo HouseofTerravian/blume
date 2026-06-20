@@ -185,7 +185,7 @@ Every task belongs to **exactly one** wave.
 | Sys | Verdict | Evidence / what's there vs. missing |
 |-----|---------|-------------------------------------|
 | S0 Foundation | **BUILT** | Both MCP servers run (`blume/src/mcp/server.ts`, `terravian-mcp/src/server.ts`). |
-| S1 Artifact Engine | **BUILT** | `src/artifacts/store.ts` — `artifact_ingest/list/get/version`; uuid + immutable timestamp + version + sha256 hash. **`listArtifacts` is Supabase-first (reads live `thq_artifacts`) with local fallback;** writes still local + live mirror. |
+| S1 Artifact Engine | **BUILT** | `src/artifacts/store.ts` — `artifact_ingest/list/get/version`; uuid + immutable timestamp + version + sha256 hash. **`listArtifacts` Supabase-first + local fallback (read).** **`artifact_ingest` is read-after-write: awaits the live mirror; success only when the row is in `thq_artifacts` (Supabase enabled); local-only when disabled.** |
 | S2 Router-Tag Engine | **BUILT** | `src/artifacts/routerTag.ts` — full contract + `routertag_validate`; auto-assigned on ingest. |
 | S3 Vault Engine | **PARTIAL** | Legacy 8-vault store still serves `blume_*vault` tools. NEW canonical **12-slug `thq_vault_registry`** built (artifacts key on slug, integers legacy-compat). Migrating the *vault-entry tools* to 12 = BLUME-032. |
 | S4 Lotus Engine | **BUILT (readiness + guidance)** | ★ `src/lotus/` — `lotus_readiness` (C/A/O/P/M + Index + band) + **`lotus_bottleneck` + `lotus_missing_evidence`** (Wave-2 depth: score→guidance). **MILESTONE: FIRST LOTUS SCORE achieved.** Still deferred: Health Bar / Tick Maps / investor summary. |
@@ -271,6 +271,13 @@ Run: `VAULT_ROOT=./.acceptance npx tsx scripts/acceptance.ts` (Supabase enabled 
 - **OFFLINE 8/8 — "PASS — local fallback path used":** Supabase disabled → reads local.
 - Plus 4 supplementary smokes pass offline (spine 18 / lotus 13 / depth 11 / recommend 13).
 **Success criterion met:** a fresh process reads from live `thq_artifacts` and produces identical readiness/recommendation **without the local JSON store**.
+
+---
+
+## 5i. Read-after-write consistency (2026-06-20) — closes the write/read timing gap
+**Gap closed:** the live mirror was fire-and-forget, so a row could be ingested but not yet in `thq_artifacts`.
+**Change (write path only — no Lotus/Recommendation/doctrine/caching changes):** `persistArtifact` now **awaits** `dbSaveArtifact` and **throws on failure** when Supabase is enabled — `artifact_ingest` does not report success until the row is in live `thq_artifacts`. The local JSON copy is written first and preserved regardless; Supabase-disabled stays local-only (fallback preserved). `ingestArtifact` / `versionArtifact` / `migrateLegacyVaultEntries` are now `async`; the generator bridge `ingestGenerated` awaits ingest inside its try/catch (stays best-effort — generation never breaks). MCP `artifact_ingest` / `artifact_migrate_legacy` handlers await.
+**Acceptance (`scripts/acceptance.ts`) — polling removed:** LIVE now does a single immediate `dbListArtifacts` right after `await ingestArtifact` → *"WRITES are in live thq_artifacts immediately after ingest (no poll)"*, then wipes local and the engine reads from Supabase. **LIVE 10/10 "Supabase read path used" + OFFLINE 8/8 "local fallback"**; 4 smokes green offline. Zero residual live rows.
 
 ---
 

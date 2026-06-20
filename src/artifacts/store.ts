@@ -25,18 +25,26 @@ function ensureDir(dir: string): void {
   fs.mkdirSync(dir, { recursive: true });
 }
 
-/** Persist an artifact (local primary + Supabase mirror). Exposed for migration. */
-export function persistArtifact(a: Artifact): void {
+/**
+ * Persist an artifact: local JSON primary (durable) + Supabase live mirror.
+ * **Read-after-write:** when Supabase is enabled, this AWAITS the mirror and THROWS if it fails —
+ * so ingest does not report success until the row is in live `thq_artifacts`. The local copy is
+ * written first and preserved regardless. When Supabase is disabled, local-only (fallback preserved).
+ */
+export async function persistArtifact(a: Artifact): Promise<void> {
   const dir = brandDir(a.brand);
   ensureDir(dir);
   fs.writeFileSync(path.join(dir, `${a.uuid}.json`), JSON.stringify(a, null, 2), "utf-8");
   if (isSupabaseEnabled()) {
-    dbSaveArtifact(a).catch(err => console.error("[Artifacts] Supabase sync failed:", err));
+    const saved = await dbSaveArtifact(a);
+    if (saved === null) {
+      throw new Error(`artifact mirror failed: write to live thq_artifacts did not succeed (uuid=${a.uuid}). Local copy preserved.`);
+    }
   }
 }
 
-/** Ingest: validate → assign uuid/timestamp/version/hash/source → store. */
-export function ingestArtifact(input: IngestInput): { artifact: Artifact; routerTag: RouterTag } {
+/** Ingest: validate → assign uuid/timestamp/version/hash/source → store (awaits live mirror). */
+export async function ingestArtifact(input: IngestInput): Promise<{ artifact: Artifact; routerTag: RouterTag }> {
   if (!input.brand || typeof input.brand !== "string") {
     throw new Error("ingest: 'brand' (slug) is required");
   }
@@ -69,7 +77,7 @@ export function ingestArtifact(input: IngestInput): { artifact: Artifact; router
     throw new Error(`ingest: invalid router-tag — ${result.errors.join("; ")}`);
   }
 
-  persistArtifact(artifact);
+  await persistArtifact(artifact);
   return { artifact, routerTag: toRouterTag(artifact) };
 }
 
@@ -149,11 +157,11 @@ export async function listArtifacts(filters: ListFilters): Promise<Artifact[]> {
 }
 
 /** Append an immutable new version; original stays intact, lineage preserved. */
-export function versionArtifact(
+export async function versionArtifact(
   uuid: string,
   body: string,
   metadata?: Record<string, unknown>,
-): Artifact {
+): Promise<Artifact> {
   const orig = getArtifact(uuid);
   if (!orig) throw new Error(`version: artifact not found: ${uuid}`);
 
@@ -176,6 +184,6 @@ export function versionArtifact(
     updated_at: now,
   };
 
-  persistArtifact(next);
+  await persistArtifact(next);
   return next;
 }

@@ -9,7 +9,7 @@
 import { ingestArtifact } from "../artifacts/store.js";
 import type { Artifact } from "../artifacts/types.js";
 
-export function ingestGenerated(input: {
+export async function ingestGenerated(input: {
   brand: string;
   title: string;
   body: string;
@@ -17,10 +17,10 @@ export function ingestGenerated(input: {
   published?: boolean;          // true → Published Works; else Creative Drafts
   switch?: number | null;       // Sales Switch the content serves
   metadata?: Record<string, unknown>;
-}): Artifact | null {
+}): Promise<Artifact | null> {
   try {
     const published = input.published === true;
-    const { artifact } = ingestArtifact({
+    const { artifact } = await ingestArtifact({
       brand: input.brand,
       title: input.title,
       body: input.body,

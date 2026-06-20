@@ -22,7 +22,7 @@ export interface MigrationReport {
   errors: string[];
 }
 
-export function migrateLegacyVaultEntries(opts: { brand?: string; dryRun?: boolean } = {}): MigrationReport {
+export async function migrateLegacyVaultEntries(opts: { brand?: string; dryRun?: boolean } = {}): Promise<MigrationReport> {
   const dryRun = opts.dryRun !== false; // default TRUE — do not migrate unless explicitly told
   const brands = opts.brand ? [opts.brand] : listBrands();
 
@@ -60,7 +60,7 @@ export function migrateLegacyVaultEntries(opts: { brand?: string; dryRun?: boole
             parent_uuid: null,
             updated_at: e.updatedAt ?? now,
           };
-          persistArtifact(art);
+          await persistArtifact(art);
         }
         mapped++;
         byBrand[brand] = (byBrand[brand] ?? 0) + 1;

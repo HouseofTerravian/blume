@@ -12,12 +12,12 @@ ok(["content","audience","offer","proof","monetization"].every(k => (empty.subSc
 
 // 2. Seed a brand to a deterministic, known score
 const B = "lotus-smoke-brand";
-const ing = (vault: string, sw: number | null, n: number) => {
-  for (let i = 0; i < n; i++) ingestArtifact({ brand: B, title: `${vault}-${sw}-${i}`, body: `x${i}`, vault, switch: sw ?? undefined });
+const ing = async (vault: string, sw: number | null, n: number) => {
+  for (let i = 0; i < n; i++) await ingestArtifact({ brand: B, title: `${vault}-${sw}-${i}`, body: `x${i}`, vault, switch: sw ?? undefined });
 };
-ing("published-works", null, 4);    // content: 4*5 = 20 (saturated)
-ing("proof-of-use", null, 2);       // audience: 2*5=10 ; proof: +2 lineages
-ing("commerce-evidence", null, 4);  // offer 20 ; proof +4 ; monetization 20
+await ing("published-works", null, 4);    // content: 4*5 = 20 (saturated)
+await ing("proof-of-use", null, 2);       // audience: 2*5=10 ; proof: +2 lineages
+await ing("commerce-evidence", null, 4);  // offer 20 ; proof +4 ; monetization 20
 
 const r = await computeReadiness(B);
 ok(r.subScores.content === 20, `content = 20 (got ${r.subScores.content})`);
@@ -31,9 +31,9 @@ ok(typeof r.generatedAt === "string", "result carries generatedAt");
 
 // 3. Versioning must NOT inflate scores (distinct lineages only)
 const V = "lotus-version-brand";
-const { artifact } = ingestArtifact({ brand: V, title: "draft", body: "v1", vault: "published-works" });
-versionArtifact(artifact.uuid, "v2");
-versionArtifact(artifact.uuid, "v3");
+const { artifact } = await ingestArtifact({ brand: V, title: "draft", body: "v1", vault: "published-works" });
+await versionArtifact(artifact.uuid, "v2");
+await versionArtifact(artifact.uuid, "v3");
 const rv = await computeReadiness(V);
 ok(rv.subScores.content === 5, `3 versions of 1 artifact → content = 5, not 15 (got ${rv.subScores.content})`);
 ok(rv.artifactCount === 1, `artifactCount counts 1 distinct lineage (got ${rv.artifactCount})`);
