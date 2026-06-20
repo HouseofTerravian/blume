@@ -102,10 +102,10 @@ Every task belongs to **exactly one** wave.
 | ⭐ BLUME-021 | 1 | S2 | Auto-assign router-tag on ingest (uuid, ts, version, source, hash) | 010,020 | **DONE** |
 | ⭐ BLUME-030 | 1 | S3 | Vault category registry — 12 canonical slugs, tiered Core/Extended/Sovereign (matches doctrine) | 003 | **DONE** (`vault_registry`) |
 | ⭐ BLUME-031 | 1 | S3 | Assign vault/category to artifact (input or default `creative-drafts`) — artifact.vault ∈ registry | 021,030 | **DONE** |
-| ⭐ BLUME-040 | 1 | S4 | Lotus scoring config: Content/Audience/Offer/Proof/Monetization (0–20 each) | 003 | TODO |
-| ⭐ BLUME-041 | 1 | S4 | Compute per-category score from a brand's artifacts (returns 5 sub-scores) | 031,040 | TODO |
-| ⭐ BLUME-042 | 1 | S4 | Launch Readiness Index = Σ→% with bands (Go ≥85 / Final-Prep / Structuring / Dev) | 041 | TODO |
-| ⭐ BLUME-043 | 1 | S4 | `readiness(brand)` tool: returns readiness % + band + sub-scores | 042 | TODO |
+| ⭐ BLUME-040 | 1 | S4 | Lotus scoring config: Content/Audience/Offer/Proof/Monetization (0–20 each) | 003 | **DONE** (`src/lotus/config.ts`, `lotus_score_config`) |
+| ⭐ BLUME-041 | 1 | S4 | Compute per-category score from a brand's artifacts (returns 5 sub-scores) | 031,040 | **DONE** (lineage-deduped) |
+| ⭐ BLUME-042 | 1 | S4 | Launch Readiness Index = Σ→% with bands (Go ≥85 / Final-Prep / Structuring / Dev) | 041 | **DONE** |
+| ⭐ BLUME-043 | 1 | S4 | `readiness(brand)` tool: returns readiness % + band + sub-scores | 042 | **DONE** (`lotus_readiness`) ★ MILESTONE |
 | BLUME-050 | 2 | S3 | Vault-as-view query: "Vault X" = artifacts WHERE brand AND vault=X | 031 | **DONE** (`artifact_list` vault filter) |
 | BLUME-051 | 2 | S3 | List vaults for a brand with counts | 050 | TODO |
 | BLUME-052 | 2 | S4 | Health Bar data structure (segments + fill %) | 041 | TODO |
@@ -188,7 +188,7 @@ Every task belongs to **exactly one** wave.
 | S1 Artifact Engine | **BUILT** | `src/artifacts/store.ts` — `artifact_ingest/list/get/version`; uuid + immutable timestamp + version + sha256 hash; local JSON primary + `thq_artifacts` mirror. |
 | S2 Router-Tag Engine | **BUILT** | `src/artifacts/routerTag.ts` — full contract + `routertag_validate`; auto-assigned on ingest. |
 | S3 Vault Engine | **PARTIAL** | Legacy 8-vault store still serves `blume_*vault` tools. NEW canonical **12-slug `thq_vault_registry`** built (artifacts key on slug, integers legacy-compat). Migrating the *vault-entry tools* to 12 = BLUME-032. |
-| S4 Lotus Engine | **MISSING** | ★ No scoring/readiness/health anywhere. The primary objective. |
+| S4 Lotus Engine | **BUILT (readiness)** | ★ `src/lotus/` — `lotus_readiness` returns C/A/O/P/M + Launch Readiness Index + band. **MILESTONE: FIRST LOTUS SCORE achieved.** Health Bar / missing-evidence / bottleneck / Tick Maps / investor summary = Wave-2 (deferred). |
 | S5 Recommendation | **MISSING** | Only `blume_diagnose_switch` point-advice; no readiness-driven "what next". |
 | S6 Sales Switch | **PARTIAL** | `content/switches.ts` + `blume_diagnose_switch` built. Switch→vault map + LUME/BLUME split not formalized. |
 | S7 Brand Engine | **PARTIAL** | Flat 26-brand registry + add/remove. No owner→holding hierarchy. |
@@ -215,7 +215,7 @@ Every task belongs to **exactly one** wave.
 
 **OBSOLETE:** `BLUME-001` (scaffold server) — both servers already run.
 **In-flight migration:** `terravian-mcp` → standalone `@terravian/blume` package via `adapters/blume.ts` (baby bridge) — **only `listBrands` migrated so far;** all other BLUME tools still use local `agents/blume/`. Finish the extraction during build, don't fork.
-**Net (updated):** **S1/S2 Artifact Spine is now BUILT** (see §5c). The **only remaining keystone is S4 Lotus** — and the Spine was built specifically so Lotus can be built immediately next.
+**Net (updated):** **Both keystones BUILT** — S1/S2 Artifact Spine (§5c) and **S4 Lotus readiness (§5d)**. **MILESTONE: FIRST LOTUS SCORE achieved — BLUME has crossed from storage system to intelligence system.** Remaining is Wave-2 depth (Lotus polish, recommendations) + cleanups (8→12 vault-tool migration).
 
 ---
 
@@ -227,6 +227,16 @@ Every task belongs to **exactly one** wave.
 **Verified:** `tsc --noEmit` clean + 18/18 runtime assertions (`scripts/spine-smoke.ts`): uuid/timestamp/version/hash assignment, vault & switch filters, uuid round-trip, immutable versioning, malformed-tag rejection, 12-vault registry.
 **Legacy safety:** vault system untouched; `artifact_migrate_legacy` is **dry-run by default** (no full migration performed). No breaking changes.
 **Lotus-ready:** `artifact_list(brand, vault?, switch?)` returns exactly what `lotus_readiness(brand)` needs (spec §8 hand-off test satisfied).
+
+---
+
+## 5d. Lotus Engine — Build Result (2026-06-20) · ★ MILESTONE: FIRST LOTUS SCORE
+**Module:** `blume/src/lotus/` — `types.ts` · `config.ts` (rubric v1) · `engine.ts`. Tools in `src/mcp/server.ts`.
+**Shipped:** `lotus_readiness(brand)` → `{ percent, band, subScores{content,audience,offer,proof,monetization}, artifactCount, generatedAt }` · `lotus_score_config`.
+**Scoring:** each category 0–20 = `min(20, distinctQualifyingArtifacts × 5)`; qualification by vault slug and/or Sales Switch (spec §3 mapping). Index = Σ = 0–100. Bands: Go ≥85 / Final-Prep 70–84 / Structuring 50–69 / Dev <50. **Stateless/derived** — reads via `listArtifacts`, owns no truth. Versions deduped by lineage (no inflation).
+**Verified:** `tsc --noEmit` clean + 13/13 runtime assertions (`scripts/lotus-smoke.ts`): graceful-empty (0%/Dev), a seeded brand scoring exactly 90/Go, per-category correctness, version-dedup, band thresholds.
+**Deferred (Wave 2, NOT built):** Health Bar, missing-evidence, bottleneck, Tick Maps, investor summary, readiness snapshots, recommendation engine.
+**Crossing:** a brand can now enter the system and receive C/A/O/P/M + Launch Readiness Index. **BLUME is now an intelligence system.**
 
 ---
 

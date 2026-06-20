@@ -1,22 +1,14 @@
 # BLUME — NEXT ACTION
 *The single next task. Do this, then update CURRENT_STATE + COMPLETED + this file.*
 
-## ▶ LOTUS ENGINE (S4) — `lotus_readiness(brand)` = MILESTONE: FIRST LOTUS SCORE
-**Wave:** 1 · **System:** S4 Lotus Engine · **Deps:** Artifact Spine (DONE)
-**Spec:** `build/LOTUS_ENGINE_SPEC_v1.md` · **Milestone:** `build/MILESTONE_FIRST_LOTUS_SCORE.md`
+## ✅ MILESTONE: FIRST LOTUS SCORE — ACHIEVED (2026-06-20)
+BLUME crossed from storage system to **intelligence system**. `lotus_readiness(brand)` returns C/A/O/P/M + Launch Readiness Index + band. This is a natural pause point — the next move is **Chude's call.**
 
-**The Spine is ready.** `artifact_list(brand, vault?, switch?)` is live and returns the full router-tag contract — exactly Lotus's input (spec §8 hand-off satisfied). Lotus owns no storage; it reads artifacts and scores.
+## ▶ Candidate next tasks (pick one; gate with *"Does this accelerate value now?"*)
+1. **Wave-2 Lotus depth** — `lotus_health_bar`, `lotus_missing_evidence`, `lotus_bottleneck` (turns a score into *guidance*: what to fix next). Highest "intelligence" leverage; per LOTUS_ENGINE_SPEC_v1.md §4–5.
+2. **Wire generators → `artifact_ingest`** — make `blume_generate_post`/offer/email/published content auto-create artifacts so scores reflect real activity without manual ingest. Makes Lotus *live*.
+3. **BLUME-032** — migrate the legacy vault-entry tools (1–8) to the 12-slug registry; optionally run `artifact_migrate_legacy dry_run=false` to backfill.
+4. **Apply `migrations/0001_artifacts.sql`** to live Supabase (`wxinipsficonhfifjqek`) to enable the `thq_artifacts` mirror (local store works without it).
+5. **S5 Recommendation Engine** — "what next" from readiness + (once built) bottleneck/missing-evidence.
 
-**Minimum to hit the milestone:**
-- Scoring config (rubric): 5 categories × 20 = `Content · Audience · Offer · Proof · Monetization`, mapped to artifact sources (vault slug / switch) per Lotus spec §3 table.
-- `lotus_readiness(brand)` → `{ percent, band, subScores{content,audience,offer,proof,monetization} }`.
-- Bands: `Go ≥85 · Final-Prep 70–84 · Structuring 50–69 · Dev <50`.
-- Reads via `listArtifacts({ brand, vault, switch })` from `src/artifacts/store.ts`.
-
-**Done when:** a brand with seeded artifacts gets all 5 sub-scores + Launch Readiness Index from one `lotus_readiness` call. **That is the storage→intelligence crossing.**
-
-**Defer (post-milestone Wave 2, do NOT build now):** Health Bar, missing-evidence, bottleneck, Tick Maps, investor summary, recommendation engine.
-
-**To seed test data:** `artifact_ingest` a few artifacts across vaults/switches for a brand, or `artifact_migrate_legacy({ brand, dryRun:false })` to backfill existing vault entries.
-
-**Guardrails:** Doctrine + taxonomy FROZEN (ADR-004). Gate every decision with *"Does this accelerate First Lotus Score?"* — else defer. Build only what `lotus_readiness` requires.
+**Guardrails:** Doctrine + taxonomy FROZEN (ADR-004). Wave-1 spine + milestone complete. Anything new still answers *"does this accelerate value?"* — else defer.
