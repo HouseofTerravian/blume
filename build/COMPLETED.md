@@ -16,4 +16,6 @@
 
 - EXTRACT · 2026-06-20 · (this commit) · `@terravian/blume` extraction — deduped persona/switches/seo/vault in terravian-mcp to re-export shims (~627 lines → ~55); logic now lives once in the package. Added `resolvePublicMode`+mode consts to blume `index.ts` exports; declared `@terravian/blume: file:../blume`. tsc clean both repos; 8/8 runtime boundary check. Generation orchestration + brand store stay local (behavior-preserving).
 
-*(Next: Wave-2 Lotus depth and/or BLUME-032 vault migration — Chude's call.)*
+- LOTUS-DEPTH (S4) · 2026-06-20 · (this commit) · Wave-2 guidance: `lotus_bottleneck` + `lotus_missing_evidence` (`src/lotus/engine.ts` + types). Lowest gating category + gap-to-next-band; empty/thin categories + suggested artifact. Closes BLUME-053/054. tsc clean; 11/11 smoke. Score → guidance.
+
+*(Next: BLUME-032 vault migration · apply artifacts DDL · S5 Recommendation · Health Bar — Chude's call.)*

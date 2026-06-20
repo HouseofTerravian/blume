@@ -38,7 +38,7 @@ import { validateRouterTag } from "../artifacts/routerTag.js";
 import { listVaultRegistry } from "../artifacts/registry.js";
 import { migrateLegacyVaultEntries } from "../artifacts/migrate.js";
 import type { ArtifactSource, RouterTag } from "../artifacts/types.js";
-import { computeReadiness, getLotusConfig } from "../lotus/engine.js";
+import { computeReadiness, getLotusConfig, detectBottleneck, detectMissingEvidence } from "../lotus/engine.js";
 
 // ─── Tool definitions ─────────────────────────────────────────────────────────
 
@@ -373,6 +373,24 @@ const TOOLS: Tool[] = [
     description: "Inspect the active Lotus scoring rubric (categories, sources, weights, bands).",
     inputSchema: { type: "object", properties: {} },
   },
+  {
+    name: "lotus_bottleneck",
+    description: "Lotus: the single lowest-scoring readiness category gating a brand, its score, the current band, and how many index points reach the next band.",
+    inputSchema: {
+      type: "object",
+      properties: { brand: { type: "string", description: "Brand slug" } },
+      required: ["brand"],
+    },
+  },
+  {
+    name: "lotus_missing_evidence",
+    description: "Lotus: readiness categories that are empty (critical) or thin, each with a suggested artifact to add. Turns a score into next actions.",
+    inputSchema: {
+      type: "object",
+      properties: { brand: { type: "string", description: "Brand slug" } },
+      required: ["brand"],
+    },
+  },
 ];
 
 // ─── Server setup ─────────────────────────────────────────────────────────────
@@ -599,6 +617,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "lotus_score_config": {
         return { content: [{ type: "text", text: JSON.stringify(getLotusConfig(), null, 2) }] };
+      }
+
+      case "lotus_bottleneck": {
+        return { content: [{ type: "text", text: JSON.stringify(detectBottleneck(String(args.brand)), null, 2) }] };
+      }
+
+      case "lotus_missing_evidence": {
+        return { content: [{ type: "text", text: JSON.stringify(detectMissingEvidence(String(args.brand)), null, 2) }] };
       }
 
       default:
