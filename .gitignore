@@ -4,3 +4,6 @@ vaults/
 exports/
 .env
 *.local
+
+# Supabase CLI link scaffold (canonical migration lives in migrations/)
+supabase/

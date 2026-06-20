@@ -20,4 +20,6 @@
 
 - RECOMMEND (S5) · 2026-06-20 · (this commit) · Recommendation Engine: `recommend_next` (`src/recommend/`). Composes Lotus readiness+bottleneck+missing-evidence + 7 Sales Switches → prioritized switch-aware plan + headline + primary action. Closes BLUME-080/081 (082 blocked on Memory). tsc clean; 13/13 smoke. BLUME now answers "what should happen next?"
 
-*(Next: BLUME-032 vault migration · apply artifacts DDL · Proof-of-Use on publish · Health Bar — Chude's call.)*
+- LIVE-MIGRATION + ACCEPTANCE · 2026-06-20 · (this commit) · Applied `0001_artifacts.sql` to live Supabase `wxinipsficonhfifjqek` (`supabase db query --linked`); registry=12, thq_artifacts live. Added `scripts/acceptance.ts` — full-loop acceptance test (create→store→read(local+live)→readiness→bottleneck→missing→recommend), self-cleaning, PASS/FAIL. **Result: PASS 13/13.** Closes BLUME-002 (DDL live).
+
+*(Next: Proof-of-Use on publish · BLUME-032 vault migration · Health Bar — Chude's call.)*
