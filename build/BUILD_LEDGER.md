@@ -150,9 +150,9 @@ Every task belongs to **exactly one** wave.
 | BLUME-170 | 5 | S4 | Performance: batch scoring across many brands | 041,121 | TODO |
 | BLUME-171 | 5 | S4 | Caching/recompute strategy for readiness | 042 | TODO |
 | BLUME-180 | 5 | S3 | Compliance vault (PARKED pending Sep–Dec 2026 review; may fold → Operations/Systems) | 031 | PARKED |
-| BLUME-200 | 4 | S17 | Content generation core: produce content artifact (post/email/page/ad copy) for brand+switch → ingests as artifact | 090,021 | TODO |
-| BLUME-201 | 4 | S17 | Channel formats: social post · email · landing copy · ad copy | 200 | TODO |
-| BLUME-202 | 4 | S17 | Generated content → Creative Drafts vault; on publish → Published Works/Proof-of-Use | 201,031 | TODO |
+| BLUME-200 | 4 | S17 | Content generation core: produce content artifact (post/email/page/ad copy) for brand+switch → ingests as artifact | 090,021 | **DONE** (`ingestGenerated`) |
+| BLUME-201 | 4 | S17 | Channel formats: social post · email · landing copy · ad copy | 200 | WIP (post/AIDA/offer/email/SEO done; ad/landing copy TODO) |
+| BLUME-202 | 4 | S17 | Generated content → Creative Drafts vault; on publish → Published Works/Proof-of-Use | 201,031 | **DONE** (drafts→Creative Drafts, approved→Published Works; Proof-of-Use deferred to terravian-mcp posting) |
 | BLUME-210 | 4 | S18 | Voice/Persona library + schema (house voices + style archetypes — see ARCHITECTURE "Voices" note) | 200 | TODO |
 | BLUME-211 | 4 | S18 | Tone selection: apply chosen voice to content generation | 210,200 | TODO |
 | BLUME-212 | 4 | S18 | A/B/n voice testing: generate variants in N voices, tag for comparison | 211 | TODO |
@@ -201,7 +201,7 @@ Every task belongs to **exactly one** wave.
 | S14 Identity | **MISSING/STUB** | `nooworld-login` brand JSON only; no MCP auth / trustee roles. |
 | S15 Terravian-MCP Routing | **PARTIAL** | Routing *mechanics* (queue/events/workflows) built; **ownership/permission model (SlateRiver→TFT/TDT) MISSING.** |
 | S16 Observability | **BUILT** | `system_health`, `failure_feed`, `analytics_summary`. |
-| S17 Content & Copywriting | **BUILT** | post / AIDA / offer / email / SEO / analyze-site. *(Generates, but does not yet ingest as artifacts — blocked on S1/S2.)* |
+| S17 Content & Copywriting | **BUILT + LIVE** | post / AIDA / offer / email / SEO. **Now auto-ingests artifacts** (`src/content/ingestGenerated.ts`) → drafts to Creative Drafts, approved posts to Published Works → **Lotus updates live**. |
 | S18 Voice / Persona | **PARTIAL** | Per-brand voice built. ✅ Doctrine-debt RESOLVED (BLUME-005): `dominion_rex`/`venus_protocol` now private; public default = calm-premium. Still no voice library / A-B (Wave 4). |
 | S19 Campaign | **PARTIAL** | AIDA sequence only; no campaign model / scoreboard / ad-budget. |
 | S20 Event Bus | **BUILT** | `event_emit/list/subscribe` (`terravian-mcp/src/events`). |
@@ -237,6 +237,14 @@ Every task belongs to **exactly one** wave.
 **Verified:** `tsc --noEmit` clean + 13/13 runtime assertions (`scripts/lotus-smoke.ts`): graceful-empty (0%/Dev), a seeded brand scoring exactly 90/Go, per-category correctness, version-dedup, band thresholds.
 **Deferred (Wave 2, NOT built):** Health Bar, missing-evidence, bottleneck, Tick Maps, investor summary, readiness snapshots, recommendation engine.
 **Crossing:** a brand can now enter the system and receive C/A/O/P/M + Launch Readiness Index. **BLUME is now an intelligence system.**
+
+---
+
+## 5e. Generators → Artifacts (Lotus runs LIVE) — Build Result (2026-06-20)
+**Module:** `blume/src/content/ingestGenerated.ts`; wired into `generator.ts` (`generatePost`/`generateOffer`/`generateEmail`; AIDA inherits via `generatePost`) + `seo.ts` (`generateSEOContent`).
+**Behavior:** every generation auto-creates an artifact — **drafts → Creative Drafts** (`source: blume-generated`), **approved posts (`humanLoop=false`) → Published Works** (`source: published`). Switch tagged by intent (post→goal, offer→5, email→5/4, SEO→3). **Best-effort: ingest failure never breaks generation; output formats unchanged.**
+**Verified (live LLM):** `scripts/generate-live-smoke.ts` 6/6 — real `generatePost(mrmetaphysical)` → artifact created (Creative Drafts, hash+uuid) → `lotus_readiness` moved **0% → 5%** with no manual ingest. tsc clean.
+**Deferred:** Proof-of-Use on real external posts lives in terravian-mcp's posting path (needs the `@terravian/blume` package extraction to share the spine); ad/landing-copy generators not built (BLUME-201 WIP).
 
 ---
 

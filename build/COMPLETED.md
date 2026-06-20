@@ -12,4 +12,6 @@
 
 - LOTUS (S4) · 2026-06-20 · (this commit) · ★ **MILESTONE: FIRST LOTUS SCORE achieved.** `src/lotus/` (types/config/engine) + `lotus_readiness`/`lotus_score_config`. C/A/O/P/M (0–20 each) → Launch Readiness Index (0–100) + bands. Closes BLUME-040/041/042/043. tsc clean; 13/13 smoke (seeded brand → 90%/Go). BLUME = intelligence system.
 
+- S17→Spine · 2026-06-20 · (this commit) · Generators wired to `artifact_ingest` — Lotus runs LIVE. `src/content/ingestGenerated.ts` + generator.ts/seo.ts. Drafts→Creative Drafts, approved→Published Works; best-effort (never breaks generation). Closes BLUME-200/202. Live test 6/6: real generatePost → artifact → lotus 0%→5%.
+
 *(Next: Wave-2 Lotus depth and/or BLUME-032 vault migration — Chude's call.)*

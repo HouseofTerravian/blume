@@ -11,6 +11,7 @@ import type { PostRequest, GeneratedPost, BlumeMode } from "./persona.js";
 import { SEVEN_SWITCHES, diagnoseSwitchFromContext } from "./switches.js";
 import type { SwitchNumber } from "./switches.js";
 import { analyzeSiteForBrand } from "./analyzer.js";
+import { ingestGenerated, goalToSwitch } from "./ingestGenerated.js";
 
 export async function generatePost(req: PostRequest): Promise<GeneratedPost> {
   const brand = loadBrand(req.brand);
@@ -39,14 +40,27 @@ Stay under ${platformLimit} characters.
   `.trim();
 
   const content = await think(systemPrompt, userMessage, { fast: aidaStage === "attention" });
+  const text = content.trim();
+
+  // Auto-create an artifact so Lotus reflects this generation (drafts → Creative Drafts;
+  // approved/immediate posts → Published Works). Best-effort; never breaks generation.
+  ingestGenerated({
+    brand: req.brand,
+    title: `${req.platform} ${aidaStage} post — ${brand.name}`,
+    body: text,
+    kind: "post",
+    published: req.humanLoop === false,
+    switch: goalToSwitch(req.goal),
+    metadata: { platform: req.platform, goal: req.goal, aidaStage, mode },
+  });
 
   return {
     brand: req.brand,
     platform: req.platform,
     mode,
     aidaStage,
-    content: content.trim(),
-    characterCount: content.trim().length,
+    content: text,
+    characterCount: text.length,
     approved: !req.humanLoop,
   };
 }
@@ -103,10 +117,18 @@ Be on-brand. No generic marketing speak.
 
   const raw = (await think(systemPrompt, userMessage, { fast: true })).trim();
   const headlineMatch = raw.match(/HEADLINE:\s*(.+)/i);
-  return {
-    title: headlineMatch?.[1]?.trim() ?? `Offer #${offerNum}`,
-    content: raw,
-  };
+  const title = headlineMatch?.[1]?.trim() ?? `Offer #${offerNum}`;
+
+  ingestGenerated({
+    brand: brandSlug,
+    title: `Offer — ${title}`,
+    body: raw,
+    kind: "offer",
+    switch: 5, // Conversion
+    metadata: { offerNum },
+  });
+
+  return { title, content: raw };
 }
 
 export async function generateEmail(
@@ -134,11 +156,18 @@ CTA: ...
 
   const raw = (await think(systemPrompt, userMessage, { fast: false })).trim();
   const subjectMatch = raw.match(/SUBJECT:\s*(.+)/i);
-  return {
-    sequence: sequenceType,
-    subject: subjectMatch?.[1]?.trim() ?? `${brand.name} — ${sequenceType}`,
+  const subject = subjectMatch?.[1]?.trim() ?? `${brand.name} — ${sequenceType}`;
+
+  ingestGenerated({
+    brand: brandSlug,
+    title: `Email (${sequenceType}) — ${subject}`,
     body: raw,
-  };
+    kind: "email",
+    switch: sequenceType === "conversion" ? 5 : 4, // conversion vs trust-building
+    metadata: { sequenceType },
+  });
+
+  return { sequence: sequenceType, subject, body: raw };
 }
 
 export async function diagnoseBrand(
