@@ -44,7 +44,7 @@ Stay under ${platformLimit} characters.
 
   // Auto-create an artifact so Lotus reflects this generation (drafts → Creative Drafts;
   // approved/immediate posts → Published Works). Best-effort; never breaks generation.
-  ingestGenerated({
+  await ingestGenerated({
     brand: req.brand,
     title: `${req.platform} ${aidaStage} post — ${brand.name}`,
     body: text,
@@ -119,7 +119,7 @@ Be on-brand. No generic marketing speak.
   const headlineMatch = raw.match(/HEADLINE:\s*(.+)/i);
   const title = headlineMatch?.[1]?.trim() ?? `Offer #${offerNum}`;
 
-  ingestGenerated({
+  await ingestGenerated({
     brand: brandSlug,
     title: `Offer — ${title}`,
     body: raw,
@@ -158,7 +158,7 @@ CTA: ...
   const subjectMatch = raw.match(/SUBJECT:\s*(.+)/i);
   const subject = subjectMatch?.[1]?.trim() ?? `${brand.name} — ${sequenceType}`;
 
-  ingestGenerated({
+  await ingestGenerated({
     brand: brandSlug,
     title: `Email (${sequenceType}) — ${subject}`,
     body: raw,

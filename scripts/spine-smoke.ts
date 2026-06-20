@@ -10,7 +10,7 @@ const ok = (c: boolean, m: string) => { if (c) { pass++; console.log("  ✓", m)
 const B = "spine-smoke-brand";
 
 // 1. ingest
-const { artifact: a, routerTag } = ingestArtifact({ brand: B, title: "Hello", body: "hello", vault: "proof-of-use", switch: 3 });
+const { artifact: a, routerTag } = await ingestArtifact({ brand: B, title: "Hello", body: "hello", vault: "proof-of-use", switch: 3 });
 ok(!!a.uuid && a.uuid.length >= 32, "ingest assigns a uuid");
 ok(a.version === 1, "version starts at 1");
 ok(a.source === "manual", "default source = manual");
@@ -32,7 +32,7 @@ const got = getArtifact(a.uuid, B);
 ok(!!got && got.body === "hello" && got.hash === a.hash, "get(uuid) round-trips body + hash");
 
 // 5. versioning (immutable original)
-const v2 = versionArtifact(a.uuid, "hello v2");
+const v2 = await versionArtifact(a.uuid, "hello v2");
 ok(v2.version === 2 && v2.parent_uuid === a.uuid, "version() → v2 with parent lineage");
 ok(getArtifact(a.uuid, B)!.body === "hello", "original version untouched");
 ok(v2.hash === createHash("sha256").update("hello v2").digest("hex"), "v2 hash recomputed");

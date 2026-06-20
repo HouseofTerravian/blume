@@ -28,7 +28,6 @@ const LIVE = isSupabaseEnabled();
 const tag = LIVE ? "Supabase-read" : "local";
 const results: { name: string; pass: boolean; detail?: string }[] = [];
 const check = (name: string, pass: boolean, detail = "") => results.push({ name, pass, detail });
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 async function cleanupLive() {
   const sb = getSupabase();
@@ -41,16 +40,15 @@ async function main() {
   if (LIVE) await cleanupLive(); // isolation
 
   // ── artifact_create + artifact_store (local primary + live thq_artifacts mirror when LIVE) ──
-  ingestArtifact({ brand: BRAND, title: "pw1", body: "alpha", vault: "published-works" });
-  ingestArtifact({ brand: BRAND, title: "pw2", body: "beta", vault: "published-works" });
-  const ce = ingestArtifact({ brand: BRAND, title: "ce1", body: "gamma", vault: "commerce-evidence" });
+  await ingestArtifact({ brand: BRAND, title: "pw1", body: "alpha", vault: "published-works" });
+  await ingestArtifact({ brand: BRAND, title: "pw2", body: "beta", vault: "published-works" });
+  const ce = await ingestArtifact({ brand: BRAND, title: "ce1", body: "gamma", vault: "commerce-evidence" });
   check("artifact_create → router-tagged artifact (uuid + sha256)", !!ce.artifact.uuid && ce.artifact.hash.length === 64);
 
   if (LIVE) {
-    // Writes mirror asynchronously — confirm they land in live thq_artifacts (independent query).
-    let liveRows: Awaited<ReturnType<typeof dbListArtifacts>> = [];
-    for (let i = 0; i < 12; i++) { liveRows = await dbListArtifacts({ brand: BRAND }); if (liveRows.length >= 3) break; await sleep(500); }
-    check("artifact WRITES landed in live thq_artifacts (3)", liveRows.length === 3, `got ${liveRows.length}`);
+    // ingest already AWAITED the live mirror (read-after-write) → rows are present immediately, NO polling.
+    const liveRows = await dbListArtifacts({ brand: BRAND });
+    check("artifact WRITES are in live thq_artifacts immediately after ingest (no poll)", liveRows.length === 3, `got ${liveRows.length}`);
     check("artifact READS from live return matching uuid + hashes", liveRows.some(r => r.uuid === ce.artifact.uuid) && liveRows.every(r => (r.hash?.length ?? 0) === 64));
 
     // PROOF: wipe the local store so any further read can ONLY come from Supabase.

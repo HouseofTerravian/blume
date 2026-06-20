@@ -24,4 +24,6 @@
 
 - LIVE-READ (reliability) · 2026-06-20 · (this commit) · `listArtifacts` now Supabase-first + local fallback (`dbReadArtifacts` null-on-error). Engine (`computeReadiness`/`detectBottleneck`/`detectMissingEvidence`/`recommend`) + handlers made async to await the read. Boundary unchanged (Lotus→listArtifacts→store→Supabase-first→local). No logic/doctrine change. Acceptance: LIVE 10/10 ("Supabase read path used", local wiped) + OFFLINE 8/8 ("local fallback"); 4 smokes green offline. Fresh process scores live data with no local store.
 
-*(Next: Proof-of-Use on publish · BLUME-032 vault migration · Health Bar — Chude's call.)*
+- READ-AFTER-WRITE (reliability) · 2026-06-20 · (this commit) · `artifact_ingest` awaits the live mirror; throws on mirror failure (Supabase enabled) so it never reports success until the row is in `thq_artifacts`. Local-only when disabled (fallback preserved). `persistArtifact`/`ingestArtifact`/`versionArtifact`/`migrate`/`ingestGenerated` + generators async; handlers await. No Lotus/Recommendation/doctrine/caching change. Acceptance polling REMOVED: LIVE 10/10 ("no poll") + OFFLINE 8/8; 4 smokes green.
+
+*(Next per Chude's ranking: Proof-of-Use on real publishes · BLUME-032 vault migration · [⏸ Memory Vault · ⏸ Health Bar/Investor Summary].)*

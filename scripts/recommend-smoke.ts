@@ -15,11 +15,11 @@ ok(er.headline.includes("Dev") && er.headline.includes("0%"), "headline reflects
 
 // 2. Seeded brand: content saturated, others empty/thin → primary tracks the bottleneck.
 const B = "rec-smoke-brand";
-const ing = (vault: string, sw: number | null, n: number) => {
-  for (let i = 0; i < n; i++) ingestArtifact({ brand: B, title: `${vault}-${i}`, body: `x${i}`, vault, switch: sw ?? undefined });
+const ing = async (vault: string, sw: number | null, n: number) => {
+  for (let i = 0; i < n; i++) await ingestArtifact({ brand: B, title: `${vault}-${i}`, body: `x${i}`, vault, switch: sw ?? undefined });
 };
-ing("published-works", null, 4); // content = 20
-ing("proof-of-use", 2, 1);       // audience = 5 (thin), proof = 5 (thin)
+await ing("published-works", null, 4); // content = 20
+await ing("proof-of-use", 2, 1);       // audience = 5 (thin), proof = 5 (thin)
 
 const r = await recommend(B);
 // scores: content 20, audience 5, offer 0, proof 5, monetization 0 → bottleneck offer
@@ -32,12 +32,12 @@ console.log("headline:", r.headline);
 
 // 3. Fully-saturated brand → launch-ready, no actions.
 const F = "rec-full-brand";
-const ingF = (vault: string, sw: number | null, n: number) => {
-  for (let i = 0; i < n; i++) ingestArtifact({ brand: F, title: `${vault}-${i}`, body: `y${i}`, vault, switch: sw ?? undefined });
+const ingF = async (vault: string, sw: number | null, n: number) => {
+  for (let i = 0; i < n; i++) await ingestArtifact({ brand: F, title: `${vault}-${i}`, body: `y${i}`, vault, switch: sw ?? undefined });
 };
-ingF("published-works", null, 4);   // content 20
-ingF("proof-of-use", 2, 4);         // audience 20 (switch 2) + proof 20 (vault)
-ingF("commerce-evidence", null, 4); // offer 20 + monetization 20
+await ingF("published-works", null, 4);   // content 20
+await ingF("proof-of-use", 2, 4);         // audience 20 (switch 2) + proof 20 (vault)
+await ingF("commerce-evidence", null, 4); // offer 20 + monetization 20
 
 const fr = await recommend(F);
 ok(fr.readiness.percent === 100 && fr.readiness.band === "Go", "full brand → 100% / Go");

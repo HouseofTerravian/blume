@@ -149,7 +149,7 @@ Return a JSON object with exactly these fields:
   }
 
   // Auto-create a Creative Drafts artifact (SEO/page copy) so Lotus reflects it.
-  ingestGenerated({
+  await ingestGenerated({
     brand: input.brand,
     title: `SEO — ${input.topic}`,
     body: `${result.meta_title}\n${result.meta_description}\n${result.h1}\n${result.intro}`,
