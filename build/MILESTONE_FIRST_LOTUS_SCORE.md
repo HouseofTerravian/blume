@@ -1,17 +1,19 @@
 # MILESTONE: FIRST LOTUS SCORE
-**Declared:** 2026-06-19 (Noo1 advisory; Terravian-relayed) · **Status:** ACTIVE — the next meaningful finish line.
-**Why it matters:** crossing this line moves BLUME **from a storage system to an intelligence system.**
+**Declared:** 2026-06-19 (Noo1 advisory; Terravian-relayed) · **★ ACHIEVED: 2026-06-20.**
+**Why it mattered:** crossing this line moved BLUME **from a storage system to an intelligence system.** Done.
 
 ---
 
-## Definition (done = all true)
-A brand can enter the system and receive:
-- [ ] **Content Score** (0–20)
-- [ ] **Audience Score** (0–20)
-- [ ] **Offer Score** (0–20)
-- [ ] **Proof Score** (0–20)
-- [ ] **Monetization Score** (0–20)
-- [ ] **Launch Readiness Index** (0–100% + band: Go ≥85 / Final-Prep 70–84 / Structuring 50–69 / Dev <50)
+## Definition (done = all true) — ✅ ALL MET
+A brand can enter the system and receive (`lotus_readiness(brand)`):
+- [x] **Content Score** (0–20)
+- [x] **Audience Score** (0–20)
+- [x] **Offer Score** (0–20)
+- [x] **Proof Score** (0–20)
+- [x] **Monetization Score** (0–20)
+- [x] **Launch Readiness Index** (0–100% + band: Go ≥85 / Final-Prep 70–84 / Structuring 50–69 / Dev <50)
+
+**Proof:** `tsc` clean + 13/13 `scripts/lotus-smoke.ts` assertions (seeded brand → 90% / Go). Built in `src/lotus/`.
 
 **Acceptance test:** `lotus_readiness(<brand>)` returns the five sub-scores + index + band, computed from artifacts ingested through the Spine, for any of the 26 brands — with no per-brand code.
 

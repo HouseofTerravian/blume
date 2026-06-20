@@ -38,6 +38,7 @@ import { validateRouterTag } from "../artifacts/routerTag.js";
 import { listVaultRegistry } from "../artifacts/registry.js";
 import { migrateLegacyVaultEntries } from "../artifacts/migrate.js";
 import type { ArtifactSource, RouterTag } from "../artifacts/types.js";
+import { computeReadiness, getLotusConfig } from "../lotus/engine.js";
 
 // ─── Tool definitions ─────────────────────────────────────────────────────────
 
@@ -355,6 +356,23 @@ const TOOLS: Tool[] = [
       },
     },
   },
+  // ─── Lotus Engine (S4) — scoring & launch readiness ────────────────────────
+  {
+    name: "lotus_readiness",
+    description: "Lotus Engine: score a brand's launch readiness. Returns the 5 sub-scores (Content/Audience/Offer/Proof/Monetization, each 0–20) + Launch Readiness Index (0–100) + band (Go ≥85 / Final-Prep / Structuring / Dev). Computed from the brand's artifacts.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        brand: { type: "string", description: "Brand slug" },
+      },
+      required: ["brand"],
+    },
+  },
+  {
+    name: "lotus_score_config",
+    description: "Inspect the active Lotus scoring rubric (categories, sources, weights, bands).",
+    inputSchema: { type: "object", properties: {} },
+  },
 ];
 
 // ─── Server setup ─────────────────────────────────────────────────────────────
@@ -571,6 +589,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           dryRun: args.dry_run !== false,
         });
         return { content: [{ type: "text", text: JSON.stringify(report, null, 2) }] };
+      }
+
+      // ─── Lotus Engine (S4) ───────────────────────────────────────────────
+      case "lotus_readiness": {
+        const readiness = computeReadiness(String(args.brand));
+        return { content: [{ type: "text", text: JSON.stringify(readiness, null, 2) }] };
+      }
+
+      case "lotus_score_config": {
+        return { content: [{ type: "text", text: JSON.stringify(getLotusConfig(), null, 2) }] };
       }
 
       default:
