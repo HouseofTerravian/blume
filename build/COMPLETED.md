@@ -26,4 +26,6 @@
 
 - READ-AFTER-WRITE (reliability) · 2026-06-20 · (this commit) · `artifact_ingest` awaits the live mirror; throws on mirror failure (Supabase enabled) so it never reports success until the row is in `thq_artifacts`. Local-only when disabled (fallback preserved). `persistArtifact`/`ingestArtifact`/`versionArtifact`/`migrate`/`ingestGenerated` + generators async; handlers await. No Lotus/Recommendation/doctrine/caching change. Acceptance polling REMOVED: LIVE 10/10 ("no poll") + OFFLINE 8/8; 4 smokes green.
 
-*(Next per Chude's ranking: Proof-of-Use on real publishes · BLUME-032 vault migration · [⏸ Memory Vault · ⏸ Health Bar/Investor Summary].)*
+- PROOF-OF-USE (S13, evidentiary) · 2026-06-20 · (this commit) · Confirmed external publishes auto-emit Proof-of-Use artifacts. New source `publish-confirmed` (+ live constraint migration 0002); `recordProofOfUse` in `@terravian/blume` captures platform/external_post_id/external_url/published_at/brand/content_hash/posting_account via the read-after-write spine; gated on `external_post_id` (intent ≠ proof). Wired at terravian-mcp confirmation boundaries (generateAndTweet/generateAndPost/firePost) best-effort. Closes BLUME-150/151. Acceptance 14/14 (Lotus sees evidence via live Supabase read, no poll) + wire-smoke 3/3. No Lotus/Recommendation/taxonomy/doctrine change.
+
+*(Next per Chude's ranking: BLUME-032 vault migration · [⏸ Memory Vault · ⏸ Health Bar/Investor Summary].)*

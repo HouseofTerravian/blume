@@ -33,3 +33,8 @@ export type { VerticalType, ListingInput, ListingRecord } from "./listings/types
 
 // Signals (Phase 2 stubs)
 export type { SignalInput, SignalResult, SourceType } from "./signals/types.js";
+
+// Proof-of-Use — confirmed-publication evidence (used by terravian-mcp publishing paths)
+export { recordProofOfUse } from "./proof/index.js";
+export type { PublishConfirmation } from "./proof/index.js";
+export type { Artifact } from "./artifacts/types.js";

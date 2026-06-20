@@ -143,8 +143,8 @@ Every task belongs to **exactly one** wave.
 | BLUME-133 | 5 | S15 | Forward-compatible re-parenting (entity tree) | 132 | TODO |
 | BLUME-134 | 5 | S15 | Route Lotus outputs via Terravian-MCP | 131,043 | TODO |
 | BLUME-140 | 5 | S14 | Identity/auth integration (Noo World login; trustee role for Sovereign) | 130 | TODO |
-| BLUME-150 | 5 | S13 | Publishing engine: StealthAPI/social publish → generates Proof-of-Use artifacts (NB: needs StealthAPI repoint to `sapi_*`) | 131 | TODO |
-| BLUME-151 | 5 | S13 | Publish → auto-ingest proof artifact loop | 150,010 | TODO |
+| BLUME-150 | 5 | S13 | Publishing engine: social publish → generates Proof-of-Use artifacts | 131 | **DONE** (gateway + twitter + scheduler emit on confirmation; §5j) |
+| BLUME-151 | 5 | S13 | Publish → auto-ingest proof artifact loop | 150,010 | **DONE** (`recordProofOfUse` on `external_post_id`) |
 | BLUME-160 | 5 | S10 | Investor Vault artifacts (pitch, deal flow) | 031 | TODO |
 | BLUME-161 | 5 | S10 | Investor readiness deck generation | 064,160 | TODO |
 | BLUME-170 | 5 | S4 | Performance: batch scoring across many brands | 041,121 | TODO |
@@ -197,7 +197,7 @@ Every task belongs to **exactly one** wave.
 | S10 Investor (V8) | **PARTIAL** | Vault 8 stores entries; no readiness/deck generation (needs Lotus). |
 | S11 Search | **BUILT** | `vault_search` (vault-based, not artifact-based). |
 | S12 Audit | **PARTIAL** | Vault append/logging only; no hash chain / immutability / versioning. |
-| S13 Publishing & Distribution | **BUILT** | Social gateway, `blume_tweet`/`blume_post`, scheduler + auto-fire daemon, bulk schedule. |
+| S13 Publishing & Distribution | **BUILT** | Social gateway, `blume_tweet`/`blume_post`, scheduler + auto-fire daemon, bulk schedule. **Confirmed publishes now emit Proof-of-Use artifacts (`publish-confirmed`) — §5j.** |
 | S14 Identity | **MISSING/STUB** | `nooworld-login` brand JSON only; no MCP auth / trustee roles. |
 | S15 Terravian-MCP Routing | **PARTIAL** | Routing *mechanics* (queue/events/workflows) built; **ownership/permission model (SlateRiver→TFT/TDT) MISSING.** |
 | S16 Observability | **BUILT** | `system_health`, `failure_feed`, `analytics_summary`. |
@@ -278,6 +278,17 @@ Run: `VAULT_ROOT=./.acceptance npx tsx scripts/acceptance.ts` (Supabase enabled 
 **Gap closed:** the live mirror was fire-and-forget, so a row could be ingested but not yet in `thq_artifacts`.
 **Change (write path only — no Lotus/Recommendation/doctrine/caching changes):** `persistArtifact` now **awaits** `dbSaveArtifact` and **throws on failure** when Supabase is enabled — `artifact_ingest` does not report success until the row is in live `thq_artifacts`. The local JSON copy is written first and preserved regardless; Supabase-disabled stays local-only (fallback preserved). `ingestArtifact` / `versionArtifact` / `migrateLegacyVaultEntries` are now `async`; the generator bridge `ingestGenerated` awaits ingest inside its try/catch (stays best-effort — generation never breaks). MCP `artifact_ingest` / `artifact_migrate_legacy` handlers await.
 **Acceptance (`scripts/acceptance.ts`) — polling removed:** LIVE now does a single immediate `dbListArtifacts` right after `await ingestArtifact` → *"WRITES are in live thq_artifacts immediately after ingest (no poll)"*, then wipes local and the engine reads from Supabase. **LIVE 10/10 "Supabase read path used" + OFFLINE 8/8 "local fallback"**; 4 smokes green offline. Zero residual live rows.
+
+---
+
+## 5j. Proof-of-Use on real publishes (2026-06-20) — evidentiary infrastructure
+**Goal:** confirmed external publication automatically creates durable evidence ("what actually happened in reality"). **Intent ≠ proof** — drafts/generated/scheduled/queued/publish-intent never qualify; the single gate is a platform-returned **`external_post_id`**.
+**Build (smallest viable):**
+- New source value **`publish-confirmed`** (`src/artifacts/types.ts`); live `thq_artifacts` source CHECK widened (`migrations/0002_publish_confirmed_source.sql`, applied).
+- **`recordProofOfUse(confirmation)`** (`src/proof/index.ts`, exported from `@terravian/blume`) — emits ONE `proof-of-use` artifact, `source=publish-confirmed`, capturing **platform · external_post_id · external_url · published_at · brand · content_hash · posting_account**. Returns `null` when no external id (intent ≠ proof). Uses the existing spine → router-tag + sha256 + **read-after-write live mirror + local fallback**.
+- **Wiring (terravian-mcp, `src/proof/emit.ts` best-effort):** called at every confirmation boundary — immediate `generateAndTweet`/`generateAndPost` and scheduler `firePost` (gateway `platform_post_id`/`platform_url` + Twitter `id`/`url`). A proof-write failure logs but never breaks an already-live publish.
+**Boundary preserved:** no change to Lotus scoring, Recommendation, taxonomy, doctrine, read-after-write, caching, or the existing acceptance architecture.
+**Acceptance (`scripts/proof-acceptance.ts`):** **PASS 14/14** — intent→null; confirmed→artifact with source/vault/platform/external-id/url/timestamp/account/hash + intact router-tag; **Lotus sees the evidence via the live Supabase read path (local wiped, no polling)**. Plus terravian-mcp `proof-wire-smoke` 3/3 (cross-package resolution + intent guard). Self-cleaning; 0 residual.
 
 ---
 
