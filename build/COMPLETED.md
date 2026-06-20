@@ -18,4 +18,6 @@
 
 - LOTUS-DEPTH (S4) · 2026-06-20 · (this commit) · Wave-2 guidance: `lotus_bottleneck` + `lotus_missing_evidence` (`src/lotus/engine.ts` + types). Lowest gating category + gap-to-next-band; empty/thin categories + suggested artifact. Closes BLUME-053/054. tsc clean; 11/11 smoke. Score → guidance.
 
-*(Next: BLUME-032 vault migration · apply artifacts DDL · S5 Recommendation · Health Bar — Chude's call.)*
+- RECOMMEND (S5) · 2026-06-20 · (this commit) · Recommendation Engine: `recommend_next` (`src/recommend/`). Composes Lotus readiness+bottleneck+missing-evidence + 7 Sales Switches → prioritized switch-aware plan + headline + primary action. Closes BLUME-080/081 (082 blocked on Memory). tsc clean; 13/13 smoke. BLUME now answers "what should happen next?"
+
+*(Next: BLUME-032 vault migration · apply artifacts DDL · Proof-of-Use on publish · Health Bar — Chude's call.)*
