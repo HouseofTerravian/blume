@@ -49,12 +49,12 @@ function bandFor(percent: number, cfg: LotusConfig): string {
 }
 
 /** The milestone call. Returns the five sub-scores + Launch Readiness Index + band for a brand. */
-export function computeReadiness(brand: string, cfg: LotusConfig = LOTUS_CONFIG): ReadinessResult {
+export async function computeReadiness(brand: string, cfg: LotusConfig = LOTUS_CONFIG): Promise<ReadinessResult> {
   if (!brand || typeof brand !== "string") {
     throw new Error("lotus_readiness: 'brand' (slug) is required");
   }
 
-  const arts = listArtifacts({ brand });
+  const arts = await listArtifacts({ brand });   // Supabase-first via the artifact store; local fallback
 
   const subScores: SubScores = {
     content: 0,
@@ -97,8 +97,8 @@ function suggestionFor(rule: CategoryRule): string {
 }
 
 /** The lowest-scoring category gating readiness, + how far to the next band. */
-export function detectBottleneck(brand: string, cfg: LotusConfig = LOTUS_CONFIG): BottleneckResult {
-  const r = computeReadiness(brand, cfg);
+export async function detectBottleneck(brand: string, cfg: LotusConfig = LOTUS_CONFIG): Promise<BottleneckResult> {
+  const r = await computeReadiness(brand, cfg);
 
   // Lowest sub-score; ties broken by config (rubric) order.
   let category: CategoryName = cfg.categories[0].name;
@@ -123,8 +123,8 @@ export function detectBottleneck(brand: string, cfg: LotusConfig = LOTUS_CONFIG)
 }
 
 /** Categories that are empty (critical) or thin (below half), with what would fill each. */
-export function detectMissingEvidence(brand: string, cfg: LotusConfig = LOTUS_CONFIG): MissingEvidenceResult {
-  const r = computeReadiness(brand, cfg);
+export async function detectMissingEvidence(brand: string, cfg: LotusConfig = LOTUS_CONFIG): Promise<MissingEvidenceResult> {
+  const r = await computeReadiness(brand, cfg);
   const items: MissingEvidenceItem[] = [];
 
   for (const rule of cfg.categories) {

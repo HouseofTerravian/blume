@@ -185,7 +185,7 @@ Every task belongs to **exactly one** wave.
 | Sys | Verdict | Evidence / what's there vs. missing |
 |-----|---------|-------------------------------------|
 | S0 Foundation | **BUILT** | Both MCP servers run (`blume/src/mcp/server.ts`, `terravian-mcp/src/server.ts`). |
-| S1 Artifact Engine | **BUILT** | `src/artifacts/store.ts` — `artifact_ingest/list/get/version`; uuid + immutable timestamp + version + sha256 hash; local JSON primary + `thq_artifacts` mirror. |
+| S1 Artifact Engine | **BUILT** | `src/artifacts/store.ts` — `artifact_ingest/list/get/version`; uuid + immutable timestamp + version + sha256 hash. **`listArtifacts` is Supabase-first (reads live `thq_artifacts`) with local fallback;** writes still local + live mirror. |
 | S2 Router-Tag Engine | **BUILT** | `src/artifacts/routerTag.ts` — full contract + `routertag_validate`; auto-assigned on ingest. |
 | S3 Vault Engine | **PARTIAL** | Legacy 8-vault store still serves `blume_*vault` tools. NEW canonical **12-slug `thq_vault_registry`** built (artifacts key on slug, integers legacy-compat). Migrating the *vault-entry tools* to 12 = BLUME-032. |
 | S4 Lotus Engine | **BUILT (readiness + guidance)** | ★ `src/lotus/` — `lotus_readiness` (C/A/O/P/M + Index + band) + **`lotus_bottleneck` + `lotus_missing_evidence`** (Wave-2 depth: score→guidance). **MILESTONE: FIRST LOTUS SCORE achieved.** Still deferred: Health Bar / Tick Maps / investor summary. |
@@ -259,6 +259,18 @@ Integrity verified: registry = 12 rows (8 core / 2 extended / 2 sovereign), `thq
 `artifact_create → store → read (local + live `thq_artifacts`) → lotus_readiness → lotus_bottleneck → lotus_missing_evidence → recommend_next`, asserts each stage, **self-cleans** its test brand from live, and prints **PASS/FAIL**.
 Run: `VAULT_ROOT=./.acceptance npx tsx scripts/acceptance.ts` (Supabase enabled from `.env`).
 **Result: PASS ✅ 13/13** — live writes land in `thq_artifacts`, live reads round-trip (uuid+hash), readiness 25%/Dev with correct C/A/O/P/M, bottleneck `audience/0`, missing-evidence 1 critical + 3 thin, `recommend_next` primary = audience. Zero residual data left in live.
+
+---
+
+## 5h. Live-read reliability fix (2026-06-20) — engine reads live, not just local
+**Gap closed:** Supabase was a write-mirror only; the engine read the local JSON store. Now **`listArtifacts` is Supabase-first with local fallback** — the read boundary Lotus/Recommendation depend on.
+**Boundary (unchanged contract):** `Lotus / Recommendation → listArtifacts → Artifact Store → Supabase-first read → local fallback`. **Lotus never queries Supabase directly.**
+**Implementation:** `dbReadArtifacts` (returns `null` on error → triggers local fallback; `[]` = legitimately empty); `store.listArtifacts` is now `async` (Supabase-first via `dbReadArtifacts`, else `listArtifactsLocal`); `computeReadiness` / `detectBottleneck` / `detectMissingEvidence` / `recommend` and the MCP handlers are now `async` (await the read). `versionArtifact` + `getArtifact` stay sync-local (fallback + local round-trip). **No change to Lotus scoring or Recommendation logic, doctrine, or taxonomy.**
+**Acceptance proof (`scripts/acceptance.ts`, two modes):**
+- **LIVE 10/10 — "PASS — Supabase read path used":** writes mirror to live; **local store is WIPED**; engine still returns 25%/Dev + audience bottleneck + recommend → it read from live `thq_artifacts`. Self-cleans.
+- **OFFLINE 8/8 — "PASS — local fallback path used":** Supabase disabled → reads local.
+- Plus 4 supplementary smokes pass offline (spine 18 / lotus 13 / depth 11 / recommend 13).
+**Success criterion met:** a fresh process reads from live `thq_artifacts` and produces identical readiness/recommendation **without the local JSON store**.
 
 ---
 

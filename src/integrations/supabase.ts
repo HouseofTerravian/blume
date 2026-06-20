@@ -127,14 +127,18 @@ export async function dbSaveArtifact(a: DbArtifact): Promise<DbArtifact | null> 
   return data as DbArtifact;
 }
 
-export async function dbListArtifacts(filters: {
+/**
+ * Read artifacts from `thq_artifacts`. Returns `null` on error or when Supabase is unavailable,
+ * so the artifact store can fall back to the local JSON store. (Empty result = `[]`, not null.)
+ */
+export async function dbReadArtifacts(filters: {
   brand: string;
   vault?: string;
   switch?: number | null;
   limit?: number;
-}): Promise<DbArtifact[]> {
+}): Promise<DbArtifact[] | null> {
   const sb = getSupabase();
-  if (!sb) return [];
+  if (!sb) return null;
 
   let query = sb.from("thq_artifacts").select("*").eq("brand", filters.brand);
   if (filters.vault) query = query.eq("vault", filters.vault);
@@ -145,10 +149,20 @@ export async function dbListArtifacts(filters: {
     .limit(filters.limit ?? 500);
 
   if (error) {
-    console.error("[Supabase] Artifact list error:", error.message);
-    return [];
+    console.error("[Supabase] Artifact read error:", error.message);
+    return null;
   }
   return (data ?? []) as DbArtifact[];
+}
+
+/** Same as dbReadArtifacts but never null ([] on error/unavailable) — for direct callers/tests. */
+export async function dbListArtifacts(filters: {
+  brand: string;
+  vault?: string;
+  switch?: number | null;
+  limit?: number;
+}): Promise<DbArtifact[]> {
+  return (await dbReadArtifacts(filters)) ?? [];
 }
 
 // ─── Op Task Creation (pipeline chaining only) ───────────────────────────────

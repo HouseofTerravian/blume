@@ -6,7 +6,7 @@ let pass = 0, fail = 0;
 const ok = (c: boolean, m: string) => { if (c) { pass++; console.log("  ✓", m); } else { fail++; console.log("  ✗ FAIL:", m); } };
 
 // 1. Empty brand → graceful zero (Dev band)
-const empty = computeReadiness("lotus-empty-brand");
+const empty = await computeReadiness("lotus-empty-brand");
 ok(empty.percent === 0 && empty.band === "Dev", "empty brand → 0% / Dev band (graceful)");
 ok(["content","audience","offer","proof","monetization"].every(k => (empty.subScores as any)[k] === 0), "empty brand → all 5 sub-scores = 0");
 
@@ -19,7 +19,7 @@ ing("published-works", null, 4);    // content: 4*5 = 20 (saturated)
 ing("proof-of-use", null, 2);       // audience: 2*5=10 ; proof: +2 lineages
 ing("commerce-evidence", null, 4);  // offer 20 ; proof +4 ; monetization 20
 
-const r = computeReadiness(B);
+const r = await computeReadiness(B);
 ok(r.subScores.content === 20, `content = 20 (got ${r.subScores.content})`);
 ok(r.subScores.audience === 10, `audience = 10 (got ${r.subScores.audience})`);
 ok(r.subScores.offer === 20, `offer = 20 (got ${r.subScores.offer})`);
@@ -34,13 +34,13 @@ const V = "lotus-version-brand";
 const { artifact } = ingestArtifact({ brand: V, title: "draft", body: "v1", vault: "published-works" });
 versionArtifact(artifact.uuid, "v2");
 versionArtifact(artifact.uuid, "v3");
-const rv = computeReadiness(V);
+const rv = await computeReadiness(V);
 ok(rv.subScores.content === 5, `3 versions of 1 artifact → content = 5, not 15 (got ${rv.subScores.content})`);
 ok(rv.artifactCount === 1, `artifactCount counts 1 distinct lineage (got ${rv.artifactCount})`);
 
 // 4. Band thresholds
 const band = (p: number) => { const tmp = `lotus-band-${p}`; return { tmp, p }; };
-ok(computeReadiness("nobody").band === "Dev", "unknown brand band = Dev");
+ok((await computeReadiness("nobody")).band === "Dev", "unknown brand band = Dev");
 
 console.log(`\nLOTUS SMOKE: ${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);

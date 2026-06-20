@@ -22,4 +22,6 @@
 
 - LIVE-MIGRATION + ACCEPTANCE · 2026-06-20 · (this commit) · Applied `0001_artifacts.sql` to live Supabase `wxinipsficonhfifjqek` (`supabase db query --linked`); registry=12, thq_artifacts live. Added `scripts/acceptance.ts` — full-loop acceptance test (create→store→read(local+live)→readiness→bottleneck→missing→recommend), self-cleaning, PASS/FAIL. **Result: PASS 13/13.** Closes BLUME-002 (DDL live).
 
+- LIVE-READ (reliability) · 2026-06-20 · (this commit) · `listArtifacts` now Supabase-first + local fallback (`dbReadArtifacts` null-on-error). Engine (`computeReadiness`/`detectBottleneck`/`detectMissingEvidence`/`recommend`) + handlers made async to await the read. Boundary unchanged (Lotus→listArtifacts→store→Supabase-first→local). No logic/doctrine change. Acceptance: LIVE 10/10 ("Supabase read path used", local wiped) + OFFLINE 8/8 ("local fallback"); 4 smokes green offline. Fresh process scores live data with no local store.
+
 *(Next: Proof-of-Use on publish · BLUME-032 vault migration · Health Bar — Chude's call.)*

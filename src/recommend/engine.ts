@@ -35,10 +35,10 @@ function rationaleFor(category: CategoryName): string {
   return `Switch ${sw} — ${info.name}: ${info.focus}`;
 }
 
-export function recommend(brand: string): Recommendation {
-  const readiness = computeReadiness(brand);
-  const bottleneck = detectBottleneck(brand);
-  const missing = detectMissingEvidence(brand);
+export async function recommend(brand: string): Promise<Recommendation> {
+  const readiness = await computeReadiness(brand);
+  const bottleneck = await detectBottleneck(brand);
+  const missing = await detectMissingEvidence(brand);
 
   const actions: RecommendedAction[] = [];
   let priority = 1;
