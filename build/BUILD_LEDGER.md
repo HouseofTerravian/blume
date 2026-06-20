@@ -94,7 +94,7 @@ Every task belongs to **exactly one** wave.
 | ~~BLUME-001~~ | 1 | S0 | ~~Scaffold BLUME-MCP server~~ — **OBSOLETE: server already runs (`blume/src/mcp/server.ts`)** | — | DONE |
 | ⭐ BLUME-004 | 1 | S0 | **Reconcile** the two existing servers against this ledger; mark statuses; document `@terravian/blume` migration | — | **DONE** (see §5b Reconciliation Result) |
 | ⭐ BLUME-005 | 1 | S18 | **Doctrine-debt:** retire public `dominion_rex`/`venus_protocol` modes → private-only; set calm-premium house voice (Calm·Premium·Intelligent·Helpful·Strategic) as default | 004 | **DONE** |
-| ⭐ BLUME-002 | 1 | S0 | Storage substrate: local JSON primary + Supabase `thq_artifacts` mirror; DDL in `migrations/0001_artifacts.sql` | 001 | **DONE** (apply DDL to live DB to enable mirror) |
+| ⭐ BLUME-002 | 1 | S0 | Storage substrate: local JSON primary + Supabase `thq_artifacts` mirror; DDL in `migrations/0001_artifacts.sql` | 001 | **DONE — DDL LIVE** on `wxinipsficonhfifjqek` (thq_artifacts + thq_vault_registry); mirror verified end-to-end |
 | ⭐ BLUME-003 | 1 | S0 | Data model: `Artifact{uuid,brand,vault,switch,title,timestamp,version,source,hash,metadata,body,ref,parent_uuid,updated_at}` + `thq_vault_registry` | 002 | **DONE** |
 | ⭐ BLUME-010 | 1 | S1 | Artifact ingest tool: accept payload (title, body/ref, brand) → returns uuid | 003 | **DONE** (`artifact_ingest`) |
 | ⭐ BLUME-011 | 1 | S1 | Artifact store: persist with hash + timestamp; retrievable by uuid | 010 | **DONE** (`artifact_get`) |
@@ -246,6 +246,19 @@ Every task belongs to **exactly one** wave.
 **Behavior:** every generation auto-creates an artifact — **drafts → Creative Drafts** (`source: blume-generated`), **approved posts (`humanLoop=false`) → Published Works** (`source: published`). Switch tagged by intent (post→goal, offer→5, email→5/4, SEO→3). **Best-effort: ingest failure never breaks generation; output formats unchanged.**
 **Verified (live LLM):** `scripts/generate-live-smoke.ts` 6/6 — real `generatePost(mrmetaphysical)` → artifact created (Creative Drafts, hash+uuid) → `lotus_readiness` moved **0% → 5%** with no manual ingest. tsc clean.
 **Deferred:** Proof-of-Use on real external posts lives in terravian-mcp's posting path (needs the `@terravian/blume` package extraction to share the spine); ad/landing-copy generators not built (BLUME-201 WIP).
+
+---
+
+## 5g. Live migration + Acceptance Test (2026-06-20) — intelligence loop proven on LIVE data
+**DDL applied to live Supabase `wxinipsficonhfifjqek`** (project "revenue-core") via the linked CLI:
+`supabase db query --linked --file migrations/0001_artifacts.sql`. Created `thq_artifacts` + `thq_vault_registry`.
+Integrity verified: registry = 12 rows (8 core / 2 extended / 2 sovereign), `thq_artifacts` present + empty, legacy-int map correct.
+*(Applied via the CLI's own legitimate auth; the project is linked but the link scaffold `supabase/` is gitignored — canonical migration stays in `migrations/`.)*
+
+**`scripts/acceptance.ts` — the single BLUME Acceptance Test.** Runs the full loop with the live DB in it:
+`artifact_create → store → read (local + live `thq_artifacts`) → lotus_readiness → lotus_bottleneck → lotus_missing_evidence → recommend_next`, asserts each stage, **self-cleans** its test brand from live, and prints **PASS/FAIL**.
+Run: `VAULT_ROOT=./.acceptance npx tsx scripts/acceptance.ts` (Supabase enabled from `.env`).
+**Result: PASS ✅ 13/13** — live writes land in `thq_artifacts`, live reads round-trip (uuid+hash), readiness 25%/Dev with correct C/A/O/P/M, bottleneck `audience/0`, missing-evidence 1 critical + 3 thin, `recommend_next` primary = audience. Zero residual data left in live.
 
 ---
 
