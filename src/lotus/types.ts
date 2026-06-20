@@ -41,3 +41,27 @@ export interface LotusConfig {
   categories: CategoryRule[];
   bands: BandRule[];
 }
+
+// ─── Wave-2 depth: guidance ────────────────────────────────────────────────
+
+export interface BottleneckResult {
+  brand: string;
+  category: CategoryName;   // lowest-scoring category gating readiness
+  score: number;            // its sub-score (0–20)
+  band: string;             // current overall band
+  gapToNextBand: number;    // index points needed to reach the next band (0 if already top)
+  generatedAt: string;
+}
+
+export interface MissingEvidenceItem {
+  category: CategoryName;
+  score: number;
+  severity: "critical" | "thin";  // critical = empty (0); thin = below half of max
+  suggestedArtifact: string;      // what to add (derived from the rubric sources)
+}
+
+export interface MissingEvidenceResult {
+  brand: string;
+  items: MissingEvidenceItem[];   // critical first, then thinnest
+  generatedAt: string;
+}

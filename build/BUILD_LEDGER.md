@@ -109,8 +109,8 @@ Every task belongs to **exactly one** wave.
 | BLUME-050 | 2 | S3 | Vault-as-view query: "Vault X" = artifacts WHERE brand AND vault=X | 031 | **DONE** (`artifact_list` vault filter) |
 | BLUME-051 | 2 | S3 | List vaults for a brand with counts | 050 | TODO |
 | BLUME-052 | 2 | S4 | Health Bar data structure (segments + fill %) | 041 | TODO |
-| BLUME-053 | 2 | S4 | Missing-evidence detection (empty/thin categories) | 041 | TODO |
-| BLUME-054 | 2 | S4 | Bottleneck detection (lowest-scoring category) | 041 | TODO |
+| BLUME-053 | 2 | S4 | Missing-evidence detection (empty/thin categories) | 041 | **DONE** (`lotus_missing_evidence`) |
+| BLUME-054 | 2 | S4 | Bottleneck detection (lowest-scoring category) | 041 | **DONE** (`lotus_bottleneck`) |
 | BLUME-055 | 2 | S4 | Tick Maps (milestone ticks → readiness contribution) | 042 | TODO |
 | BLUME-060 | 2 | S11 | Artifact search by brand/vault/switch/text | 031 | WIP (brand/vault/switch DONE via `artifact_list`; text search TODO) |
 | BLUME-061 | 2 | S11 | Readiness/vault summary query API | 043,050 | TODO |
@@ -188,7 +188,7 @@ Every task belongs to **exactly one** wave.
 | S1 Artifact Engine | **BUILT** | `src/artifacts/store.ts` — `artifact_ingest/list/get/version`; uuid + immutable timestamp + version + sha256 hash; local JSON primary + `thq_artifacts` mirror. |
 | S2 Router-Tag Engine | **BUILT** | `src/artifacts/routerTag.ts` — full contract + `routertag_validate`; auto-assigned on ingest. |
 | S3 Vault Engine | **PARTIAL** | Legacy 8-vault store still serves `blume_*vault` tools. NEW canonical **12-slug `thq_vault_registry`** built (artifacts key on slug, integers legacy-compat). Migrating the *vault-entry tools* to 12 = BLUME-032. |
-| S4 Lotus Engine | **BUILT (readiness)** | ★ `src/lotus/` — `lotus_readiness` returns C/A/O/P/M + Launch Readiness Index + band. **MILESTONE: FIRST LOTUS SCORE achieved.** Health Bar / missing-evidence / bottleneck / Tick Maps / investor summary = Wave-2 (deferred). |
+| S4 Lotus Engine | **BUILT (readiness + guidance)** | ★ `src/lotus/` — `lotus_readiness` (C/A/O/P/M + Index + band) + **`lotus_bottleneck` + `lotus_missing_evidence`** (Wave-2 depth: score→guidance). **MILESTONE: FIRST LOTUS SCORE achieved.** Still deferred: Health Bar / Tick Maps / investor summary. |
 | S5 Recommendation | **MISSING** | Only `blume_diagnose_switch` point-advice; no readiness-driven "what next". |
 | S6 Sales Switch | **PARTIAL** | `content/switches.ts` + `blume_diagnose_switch` built. Switch→vault map + LUME/BLUME split not formalized. |
 | S7 Brand Engine | **PARTIAL** | Flat 26-brand registry + add/remove. No owner→holding hierarchy. |
@@ -235,8 +235,9 @@ Every task belongs to **exactly one** wave.
 **Shipped:** `lotus_readiness(brand)` → `{ percent, band, subScores{content,audience,offer,proof,monetization}, artifactCount, generatedAt }` · `lotus_score_config`.
 **Scoring:** each category 0–20 = `min(20, distinctQualifyingArtifacts × 5)`; qualification by vault slug and/or Sales Switch (spec §3 mapping). Index = Σ = 0–100. Bands: Go ≥85 / Final-Prep 70–84 / Structuring 50–69 / Dev <50. **Stateless/derived** — reads via `listArtifacts`, owns no truth. Versions deduped by lineage (no inflation).
 **Verified:** `tsc --noEmit` clean + 13/13 runtime assertions (`scripts/lotus-smoke.ts`): graceful-empty (0%/Dev), a seeded brand scoring exactly 90/Go, per-category correctness, version-dedup, band thresholds.
-**Deferred (Wave 2, NOT built):** Health Bar, missing-evidence, bottleneck, Tick Maps, investor summary, readiness snapshots, recommendation engine.
-**Crossing:** a brand can now enter the system and receive C/A/O/P/M + Launch Readiness Index. **BLUME is now an intelligence system.**
+**Wave-2 depth added (2026-06-20):** `lotus_bottleneck` (lowest category + gap-to-next-band) + `lotus_missing_evidence` (empty=critical / thin categories + suggested artifact). Pure/derived (reuse `computeReadiness`). Verified: tsc clean + 11/11 (`scripts/lotus-depth-smoke.ts`).
+**Still deferred (NOT built):** Health Bar, Tick Maps, investor summary, readiness snapshots, recommendation engine (S5).
+**Crossing:** a brand can now enter the system and receive C/A/O/P/M + Launch Readiness Index — **and now guidance on what to fix next.** BLUME is an intelligence system.
 
 ---
 
