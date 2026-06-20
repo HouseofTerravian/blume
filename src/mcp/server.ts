@@ -589,7 +589,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "artifact_list": {
-        const arts = listArtifacts({
+        const arts = await listArtifacts({
           brand:  String(args.brand),
           vault:  args.vault !== undefined ? String(args.vault) : undefined,
           switch: args.switch !== undefined ? Number(args.switch) : undefined,
@@ -622,7 +622,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       // ─── Lotus Engine (S4) ───────────────────────────────────────────────
       case "lotus_readiness": {
-        const readiness = computeReadiness(String(args.brand));
+        const readiness = await computeReadiness(String(args.brand));
         return { content: [{ type: "text", text: JSON.stringify(readiness, null, 2) }] };
       }
 
@@ -631,16 +631,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "lotus_bottleneck": {
-        return { content: [{ type: "text", text: JSON.stringify(detectBottleneck(String(args.brand)), null, 2) }] };
+        return { content: [{ type: "text", text: JSON.stringify(await detectBottleneck(String(args.brand)), null, 2) }] };
       }
 
       case "lotus_missing_evidence": {
-        return { content: [{ type: "text", text: JSON.stringify(detectMissingEvidence(String(args.brand)), null, 2) }] };
+        return { content: [{ type: "text", text: JSON.stringify(await detectMissingEvidence(String(args.brand)), null, 2) }] };
       }
 
       // ─── Recommendation Engine (S5) ──────────────────────────────────────
       case "recommend_next": {
-        return { content: [{ type: "text", text: JSON.stringify(recommend(String(args.brand)), null, 2) }] };
+        return { content: [{ type: "text", text: JSON.stringify(await recommend(String(args.brand)), null, 2) }] };
       }
 
       default:

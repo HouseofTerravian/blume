@@ -8,11 +8,12 @@ Completed +   : **★ FIRST LOTUS SCORE achieved + Lotus now runs LIVE.** BLUME-
 Extraction   : `@terravian/blume` dedup DONE (persona/switches/seo/vault = shims; ~627→~55 lines).
 Lotus depth  : Wave-2 guidance DONE — `lotus_bottleneck` + `lotus_missing_evidence` (BLUME-053/054).
 S5 Recommend : DONE — `recommend_next` (BLUME-080/081): Lotus + 7 Switches → prioritized plan + headline.
-LIVE + TESTED : **DDL applied to live Supabase `wxinipsficonhfifjqek`** (thq_artifacts + thq_vault_registry, registry=12). **`scripts/acceptance.ts` = single full-loop acceptance test → PASS 13/13** (create→store→read local+live→readiness→bottleneck→missing→recommend; self-cleaning). The intelligence loop is proven against live data.
+LIVE + TESTED : DDL applied to live Supabase `wxinipsficonhfifjqek` (thq_artifacts + thq_vault_registry, registry=12).
+LIVE-READ ✓   : **`listArtifacts` Supabase-first + local fallback (2026-06-20).** Engine/handlers now async; reads live `thq_artifacts`, falls back to local on error/offline. Boundary unchanged (Lotus→listArtifacts→store→Supabase-first→local; Lotus never queries Supabase). No logic/doctrine change. **Acceptance: LIVE 10/10 "Supabase read path used" (local wiped) + OFFLINE 8/8 "local fallback"**; 4 smokes green offline. Fresh process scores live data without the local store.
 In Progress   : none
 Blocked       : none
-Next Task     : **Chude's call.** Loop is live + acceptance-green. Options: (a) Proof-of-Use on real publishes (terravian-mcp posting → artifact), (b) **BLUME-032** vault-tool migration 8→12, (c) Health Bar / investor summary, (d) S8 Memory vault (unblocks BLUME-082), (e) make `listArtifacts` Supabase-read (engine reads live, not just local — reliability).
-How to re-test: `VAULT_ROOT=./.acceptance npx tsx scripts/acceptance.ts` (Supabase from .env). Apply DDL: `supabase db query --linked --file migrations/0001_artifacts.sql`.
+Next Task     : **Chude's call.** Loop is live, live-read, and acceptance-green both ways. Options: (a) Proof-of-Use on real publishes (terravian-mcp posting → artifact), (b) **BLUME-032** vault-tool migration 8→12, (c) Health Bar / investor summary, (d) S8 Memory vault (unblocks BLUME-082).
+How to re-test: LIVE `VAULT_ROOT=./.acc-live npx tsx scripts/acceptance.ts` · OFFLINE `SUPABASE_URL= VAULT_ROOT=./.acc-local npx tsx scripts/acceptance.ts`. Apply DDL: `supabase db query --linked --file migrations/0001_artifacts.sql`.
 Usage note   : Generating content auto-feeds Lotus now. Manual seeding still available via `artifact_ingest` / `artifact_migrate_legacy dry_run=false`.
 Specs ready  : **`build/ARTIFACT_SPINE_SPEC_v1.md`** (S1/S2) + **`build/LOTUS_ENGINE_SPEC_v1.md`** (S4) — build-ready. **PR #1 + PR #2 both MERGED to main.** Spec phase CLOSED.
 ★ Milestone   : **FIRST LOTUS SCORE** (`build/MILESTONE_FIRST_LOTUS_SCORE.md`) — brand gets C/A/O/P/M + Launch Readiness Index. = storage→intelligence crossing. **Lotus is the primary objective.**

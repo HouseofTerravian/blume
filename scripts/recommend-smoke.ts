@@ -6,7 +6,7 @@ let pass = 0, fail = 0;
 const ok = (c: boolean, m: string) => { if (c) { pass++; console.log("  ✓", m); } else { fail++; console.log("  ✗ FAIL:", m); } };
 
 // 1. Empty brand → every category is a critical action; primary = the gating (content) category.
-const er = recommend("rec-empty");
+const er = await recommend("rec-empty");
 ok(er.actions.length === 5 && er.actions.every(a => a.severity === "critical"), "empty brand → 5 critical actions");
 ok(er.primaryAction?.category === "content", "empty brand primary = content (gating)");
 ok(er.actions.every(a => a.salesSwitch >= 1 && a.salesSwitch <= 7 && a.rationale.includes("Switch")), "every action has a Sales Switch + rationale");
@@ -21,7 +21,7 @@ const ing = (vault: string, sw: number | null, n: number) => {
 ing("published-works", null, 4); // content = 20
 ing("proof-of-use", 2, 1);       // audience = 5 (thin), proof = 5 (thin)
 
-const r = recommend(B);
+const r = await recommend(B);
 // scores: content 20, audience 5, offer 0, proof 5, monetization 0 → bottleneck offer
 ok(r.primaryAction?.category === "offer" && r.primaryAction?.severity === "critical", "primary = offer/critical (the bottleneck)");
 ok(r.actions.find(a => a.category === "content") === undefined, "saturated content yields no action");
@@ -39,7 +39,7 @@ ingF("published-works", null, 4);   // content 20
 ingF("proof-of-use", 2, 4);         // audience 20 (switch 2) + proof 20 (vault)
 ingF("commerce-evidence", null, 4); // offer 20 + monetization 20
 
-const fr = recommend(F);
+const fr = await recommend(F);
 ok(fr.readiness.percent === 100 && fr.readiness.band === "Go", "full brand → 100% / Go");
 ok(fr.actions.length === 0 && fr.primaryAction === null, "full brand → no actions");
 ok(fr.headline.startsWith("Launch-ready"), "full brand → Launch-ready headline");

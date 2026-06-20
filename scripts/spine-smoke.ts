@@ -22,10 +22,10 @@ ok(a.vault === "proof-of-use", "vault stored as canonical slug");
 ok(validateRouterTag(routerTag, { body: "hello" }).valid, "emitted router-tag validates (with hash check)");
 
 // 3. list filters (the Lotus call)
-ok(listArtifacts({ brand: B }).some(x => x.uuid === a.uuid), "artifact_list(brand) returns it");
-ok(listArtifacts({ brand: B, vault: "proof-of-use" }).length >= 1, "filter by vault works");
-ok(listArtifacts({ brand: B, switch: 3 }).length >= 1, "filter by switch works");
-ok(listArtifacts({ brand: B, vault: "investor" }).every(x => x.vault === "investor"), "vault filter excludes others");
+ok((await listArtifacts({ brand: B })).some(x => x.uuid === a.uuid), "artifact_list(brand) returns it");
+ok((await listArtifacts({ brand: B, vault: "proof-of-use" })).length >= 1, "filter by vault works");
+ok((await listArtifacts({ brand: B, switch: 3 })).length >= 1, "filter by switch works");
+ok((await listArtifacts({ brand: B, vault: "investor" })).every(x => x.vault === "investor"), "vault filter excludes others");
 
 // 4. round-trip
 const got = getArtifact(a.uuid, B);
