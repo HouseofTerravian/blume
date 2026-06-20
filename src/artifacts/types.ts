@@ -10,7 +10,8 @@ export type ArtifactSource =
   | "blume-generated"
   | "manual"
   | "imported"
-  | "published"
+  | "published"          // publish INTENT (approved/queued) — NOT evidence of real publication
+  | "publish-confirmed"  // CONFIRMED external publication — Proof-of-Use evidence
   | "system";
 
 export const ARTIFACT_SOURCES: readonly ArtifactSource[] = [
@@ -18,6 +19,7 @@ export const ARTIFACT_SOURCES: readonly ArtifactSource[] = [
   "manual",
   "imported",
   "published",
+  "publish-confirmed",
   "system",
 ];
 

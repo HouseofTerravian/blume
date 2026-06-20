@@ -15,8 +15,8 @@ BLUME crossed from storage system to **intelligence system**. `lotus_readiness(b
 
 ## ▶ Next (Chude's ranking, 2026-06-20)
 1. ✅ **Await live mirror** — DONE (read-after-write).
-2. ▶ **Proof-of-Use on real publishes** — terravian-mcp posting path → artifact (the deferred half of "on publish"; easier post-extraction). **← next**
-3. **BLUME-032** — migrate legacy vault-entry tools (1–8) to the 12-slug registry.
+2. ✅ **Proof-of-Use on real publishes** — DONE (`recordProofOfUse`; `publish-confirmed`; wired at terravian-mcp confirmation boundaries; acceptance 14/14).
+3. ▶ **BLUME-032** — migrate legacy vault-entry tools (1–8) to the 12-slug registry. **← next**
 4. ⏸ **Memory Vault** (S8) — deferred.
 5. ⏸ **Health Bar / Investor Summary** — deferred.
 
