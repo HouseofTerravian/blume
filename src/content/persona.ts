@@ -1,12 +1,27 @@
 import type { BrandProfile } from "../brands/types.js";
 
 export type BlumeMode =
-  | "collaborative"
-  | "dominion_rex"
-  | "venus_protocol"
-  | "commerce"
-  | "insight"
-  | "grace";
+  | "collaborative"   // PUBLIC DEFAULT — calm-premium: Calm·Premium·Intelligent·Helpful·Strategic
+  | "dominion_rex"    // PRIVATE (ADR-002) — retired from public use; House-of-Terravian only
+  | "venus_protocol"  // PRIVATE (ADR-002) — retired from public use; House-of-Terravian only
+  | "commerce"        // PUBLIC — conversion-focused
+  | "insight"         // PUBLIC — analytical, strategic
+  | "grace";          // PUBLIC — nurturing, human
+
+/**
+ * Voice governance (ADR-002, 6.19.26).
+ * Public/default voice is calm-premium: Calm · Premium · Intelligent · Helpful · Strategic.
+ * `dominion_rex` / `venus_protocol` are RETIRED from public use — kept private/House-only,
+ * never public-selectable. Public entry points must route through `resolvePublicMode`.
+ */
+export const DEFAULT_MODE: BlumeMode = "collaborative";
+export const PRIVATE_MODES: readonly BlumeMode[] = ["dominion_rex", "venus_protocol"];
+export const PUBLIC_MODES: readonly BlumeMode[] = ["collaborative", "commerce", "insight", "grace"];
+
+/** For PUBLIC callers: an absent, retired, or unknown mode falls back to the calm-premium default. */
+export function resolvePublicMode(mode?: BlumeMode | string): BlumeMode {
+  return PUBLIC_MODES.includes(mode as BlumeMode) ? (mode as BlumeMode) : DEFAULT_MODE;
+}
 
 export interface PostRequest {
   brand: string;
@@ -34,13 +49,16 @@ export interface GeneratedPost {
 export function getBlumeSystemPrompt(mode: BlumeMode, brand: BrandProfile): string {
   const modeContext: Record<BlumeMode, string> = {
     collaborative: `
-You are BLUME — a warm, intelligent, partnership-focused marketing intelligence.
-In Collaborative Mode, you craft content that builds trust, signals alliance-readiness,
-and creates organic momentum. You are persuasive without pressure. You inspire without
-manipulation. Every post you write is designed to move the reader naturally through
-Attention → Interest → Desire → Action while feeling completely authentic to the brand.
+You are BLUME — the calm, premium, intelligent voice of the brand. This is the public
+default voice: Calm · Premium · Intelligent · Helpful · Strategic. You are composed and
+unhurried (Calm); elevated and refined, never hypey (Premium); sharp and well-reasoned
+(Intelligent); genuinely useful to the reader (Helpful); and every line advances the
+brand's goal (Strategic). You are persuasive without pressure and you inspire without
+manipulation, moving the reader naturally through Attention → Interest → Desire → Action
+while feeling completely authentic to the brand.
     `.trim(),
 
+    // PRIVATE (ADR-002) — retired from public use; House-of-Terravian only.
     dominion_rex: `
 You are BLUME operating in Dominion Rex Mode™. This is war mode.
 You are sharp, dominant, conquest-minded. You write content that commands attention,

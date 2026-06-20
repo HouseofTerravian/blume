@@ -85,7 +85,7 @@ async function cmdBulkGenerate(postCount: number, offerCount: number, emailCount
   const platforms = ["twitter", "instagram", "linkedin"];
   const goals = ["awareness", "engagement", "conversion", "retention", "launch"];
   const aidaStages = ["attention", "interest", "desire", "action"];
-  const modes: BlumeMode[] = ["collaborative", "dominion_rex", "venus_protocol", "commerce", "insight", "grace"];
+  const modes: BlumeMode[] = ["collaborative", "commerce", "insight", "grace"];  // public voices only (ADR-002)
   const emailTypes = ["welcome", "nurture", "conversion"];
 
   for (const brandSlug of brands) {

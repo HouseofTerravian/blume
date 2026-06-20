@@ -93,7 +93,7 @@ Every task belongs to **exactly one** wave.
 |----|------|-----|----------------------|------|--------|
 | ~~BLUME-001~~ | 1 | S0 | ~~Scaffold BLUME-MCP server~~ — **OBSOLETE: server already runs (`blume/src/mcp/server.ts`)** | — | DONE |
 | ⭐ BLUME-004 | 1 | S0 | **Reconcile** the two existing servers against this ledger; mark statuses; document `@terravian/blume` migration | — | **DONE** (see §5b Reconciliation Result) |
-| ⭐ BLUME-005 | 1 | S18 | **Doctrine-debt:** retire public `dominion_rex`/`venus_protocol` modes → private-only; set calm-premium house voice (Calm·Premium·Intelligent·Helpful·Strategic) as default | 004 | TODO |
+| ⭐ BLUME-005 | 1 | S18 | **Doctrine-debt:** retire public `dominion_rex`/`venus_protocol` modes → private-only; set calm-premium house voice (Calm·Premium·Intelligent·Helpful·Strategic) as default | 004 | **DONE** |
 | ⭐ BLUME-002 | 1 | S0 | Connect storage substrate (Supabase `wxinipsficonhfifjqek`, `blume_*`/`sapi_*`) — write+read a row | 001 | TODO |
 | ⭐ BLUME-003 | 1 | S0 | Minimal data model: `artifact(uuid,brand,vault,switch,title,ts,version,source,hash,metadata jsonb)` — migration applied (dev) | 002 | TODO |
 | ⭐ BLUME-010 | 1 | S1 | Artifact ingest tool: accept payload (title, body/ref, brand) → returns uuid | 003 | TODO |
@@ -202,7 +202,7 @@ Every task belongs to **exactly one** wave.
 | S15 Terravian-MCP Routing | **PARTIAL** | Routing *mechanics* (queue/events/workflows) built; **ownership/permission model (SlateRiver→TFT/TDT) MISSING.** |
 | S16 Observability | **BUILT** | `system_health`, `failure_feed`, `analytics_summary`. |
 | S17 Content & Copywriting | **BUILT** | post / AIDA / offer / email / SEO / analyze-site. *(Generates, but does not yet ingest as artifacts — blocked on S1/S2.)* |
-| S18 Voice / Persona | **PARTIAL** | Per-brand voice built. **Doctrine-debt:** public `dominion_rex`/`venus_protocol` modes present (→ BLUME-005). No voice library / A-B. |
+| S18 Voice / Persona | **PARTIAL** | Per-brand voice built. ✅ Doctrine-debt RESOLVED (BLUME-005): `dominion_rex`/`venus_protocol` now private; public default = calm-premium. Still no voice library / A-B (Wave 4). |
 | S19 Campaign | **PARTIAL** | AIDA sequence only; no campaign model / scoreboard / ad-budget. |
 | S20 Event Bus | **BUILT** | `event_emit/list/subscribe` (`terravian-mcp/src/events`). |
 | S21 Job Queue & Daemon | **BUILT** | `op_task_*`, `queue_list`, handlers (vault/social/festival/affiliate/email). |

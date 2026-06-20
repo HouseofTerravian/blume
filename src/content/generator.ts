@@ -6,7 +6,7 @@
 
 import { think } from "../integrations/ai.js";
 import { loadBrand } from "../brands/registry.js";
-import { getBlumeSystemPrompt, PLATFORM_LIMITS } from "./persona.js";
+import { getBlumeSystemPrompt, PLATFORM_LIMITS, resolvePublicMode } from "./persona.js";
 import type { PostRequest, GeneratedPost, BlumeMode } from "./persona.js";
 import { SEVEN_SWITCHES, diagnoseSwitchFromContext } from "./switches.js";
 import type { SwitchNumber } from "./switches.js";
@@ -14,7 +14,7 @@ import { analyzeSiteForBrand } from "./analyzer.js";
 
 export async function generatePost(req: PostRequest): Promise<GeneratedPost> {
   const brand = loadBrand(req.brand);
-  const mode: BlumeMode = req.mode ?? "collaborative";
+  const mode: BlumeMode = resolvePublicMode(req.mode);  // retired/unknown → calm-premium default
   const aidaStage = req.aidaStage ?? "attention";
 
   const systemPrompt = getBlumeSystemPrompt(mode, brand);
