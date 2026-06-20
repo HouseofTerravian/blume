@@ -4,8 +4,9 @@
 ## ✅ MILESTONE: FIRST LOTUS SCORE — ACHIEVED (2026-06-20)
 BLUME crossed from storage system to **intelligence system**. `lotus_readiness(brand)` returns C/A/O/P/M + Launch Readiness Index + band. This is a natural pause point — the next move is **Chude's call.**
 
-## ✅ Done since milestone: generators → artifacts (Lotus runs LIVE)
-Generating posts/AIDA/offers/emails/SEO now auto-creates artifacts (drafts→Creative Drafts, approved→Published Works), so `lotus_readiness` reflects real activity with no manual ingest. Verified live.
+## ✅ Done since milestone
+- **Generators → artifacts (Lotus runs LIVE):** generating posts/AIDA/offers/emails/SEO auto-creates artifacts; `lotus_readiness` reflects real activity with no manual ingest.
+- **`@terravian/blume` extraction:** terravian-mcp's persona/switches/seo/vault are now re-export shims pointing at the package (logic deduped to one place). Generation orchestration + brand store stay local by design.
 
 ## ▶ Candidate next tasks (pick one; gate with *"Does this accelerate value now?"*)
 1. **Wave-2 Lotus depth** — `lotus_bottleneck` + `lotus_missing_evidence` (turns a *score* into *guidance*: "fix Proof next"). Highest intelligence leverage; per LOTUS_ENGINE_SPEC_v1.md §4–5.

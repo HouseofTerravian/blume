@@ -8,7 +8,7 @@
 // Content generation
 export { generatePost, generateAIDASequence, generateOffer, generateEmail, diagnoseBrand, analyzeSiteForBrand } from "./content/generator.js";
 export { generateSEOContent, generateFestivalSEO } from "./content/seo.js";
-export { getBlumeSystemPrompt, PLATFORM_LIMITS } from "./content/persona.js";
+export { getBlumeSystemPrompt, PLATFORM_LIMITS, resolvePublicMode, DEFAULT_MODE, PUBLIC_MODES, PRIVATE_MODES } from "./content/persona.js";
 export { SEVEN_SWITCHES, diagnoseSwitchFromContext } from "./content/switches.js";
 export type { BlumeMode, PostRequest, GeneratedPost } from "./content/persona.js";
 export type { SwitchNumber, SalesSwitch } from "./content/switches.js";
