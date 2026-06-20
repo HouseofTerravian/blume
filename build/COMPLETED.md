@@ -28,4 +28,6 @@
 
 - PROOF-OF-USE (S13, evidentiary) · 2026-06-20 · (this commit) · Confirmed external publishes auto-emit Proof-of-Use artifacts. New source `publish-confirmed` (+ live constraint migration 0002); `recordProofOfUse` in `@terravian/blume` captures platform/external_post_id/external_url/published_at/brand/content_hash/posting_account via the read-after-write spine; gated on `external_post_id` (intent ≠ proof). Wired at terravian-mcp confirmation boundaries (generateAndTweet/generateAndPost/firePost) best-effort. Closes BLUME-150/151. Acceptance 14/14 (Lotus sees evidence via live Supabase read, no poll) + wire-smoke 3/3. No Lotus/Recommendation/taxonomy/doctrine change.
 
-*(Next per Chude's ranking: BLUME-032 vault migration · [⏸ Memory Vault · ⏸ Health Bar/Investor Summary].)*
+- BLUME-032 (S3, vault migration) · 2026-06-20 · (this commit) · Vault module migrated 8→12: derives from the canonical registry (slug canonical, integers legacy-compat; 1–8 meaning preserved, names aligned to legal/investor; +9 R&D/11 Memory/12 Library; 10 Compliance parked). init/summary/search/db span 12; blume + terravian-mcp vault tool ranges → 1–12. thq_vault_entries empty → no data migration. tsc clean both repos; vault-migration-smoke 17/17; no regression (proof 14/14, acceptance 10/10+8/8).
+
+*(Next per Chude's ranking: ⏸ Memory Vault · ⏸ Health Bar/Investor Summary — both deferred. Wave-1 + reliability + proof + vault-taxonomy all DONE.)*

@@ -16,8 +16,10 @@ BLUME crossed from storage system to **intelligence system**. `lotus_readiness(b
 ## ▶ Next (Chude's ranking, 2026-06-20)
 1. ✅ **Await live mirror** — DONE (read-after-write).
 2. ✅ **Proof-of-Use on real publishes** — DONE (`recordProofOfUse`; `publish-confirmed`; wired at terravian-mcp confirmation boundaries; acceptance 14/14).
-3. ▶ **BLUME-032** — migrate legacy vault-entry tools (1–8) to the 12-slug registry. **← next**
+3. ✅ **BLUME-032** — vault module migrated 8→12 (derives from canonical registry; integers legacy-compat). vault-migration-smoke 17/17.
 4. ⏸ **Memory Vault** (S8) — deferred.
 5. ⏸ **Health Bar / Investor Summary** — deferred.
+
+**All of Chude's ranked items (1–3) are DONE.** Remaining (4–5) are explicitly deferred. Wave-1 spine, Lotus + guidance + recommendation, live-read, read-after-write, Proof-of-Use, and the 12-vault taxonomy are all complete. Awaiting the next directive.
 
 **Guardrails:** Doctrine + taxonomy FROZEN (ADR-004). Wave-1 spine + milestone complete. Anything new still answers *"does this accelerate value?"* — else defer.
