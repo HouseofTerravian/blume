@@ -33,6 +33,11 @@ import type { PostRequest } from "../content/persona.js";
 import type { VaultNumber } from "../vault/types.js";
 import type { BrandProfile } from "../brands/types.js";
 import type { FestivalInput, FestivalCategory, FestivalStatus } from "../listings/festivals/types.js";
+import { ingestArtifact, getArtifact, listArtifacts } from "../artifacts/store.js";
+import { validateRouterTag } from "../artifacts/routerTag.js";
+import { listVaultRegistry } from "../artifacts/registry.js";
+import { migrateLegacyVaultEntries } from "../artifacts/migrate.js";
+import type { ArtifactSource, RouterTag } from "../artifacts/types.js";
 
 // ─── Tool definitions ─────────────────────────────────────────────────────────
 
@@ -278,6 +283,78 @@ const TOOLS: Tool[] = [
       },
     },
   },
+  // ─── Artifact / Router-Tag Spine (S1/S2) — substrate for Lotus ──────────────
+  {
+    name: "artifact_ingest",
+    description: "Ingest an artifact: validates, assigns uuid + timestamp + version + hash, and stores it with a router-tag. Returns the artifact and its router-tag.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        brand:   { type: "string", description: "Brand slug" },
+        title:   { type: "string", description: "Artifact title" },
+        body:    { type: "string", description: "Inline content (hashed)" },
+        ref:     { type: "string", description: "Pointer/URL when content is not inline" },
+        vault:   { type: "string", description: "Canonical vault slug (default: creative-drafts)" },
+        switch:  { type: "number", description: "Sales Switch 1..7 (optional)" },
+        source:  { type: "string", enum: ["blume-generated", "manual", "imported", "published", "system"], description: "Default: manual" },
+        metadata: { type: "object", description: "Open metadata (campaign, channels, platform, ...)" },
+      },
+      required: ["brand", "title"],
+    },
+  },
+  {
+    name: "artifact_list",
+    description: "List artifacts for a brand, optionally filtered by vault slug and/or Sales Switch. (The call the Lotus Engine uses to score a brand.)",
+    inputSchema: {
+      type: "object",
+      properties: {
+        brand:  { type: "string", description: "Brand slug" },
+        vault:  { type: "string", description: "Filter by canonical vault slug" },
+        switch: { type: "number", description: "Filter by Sales Switch 1..7" },
+        limit:  { type: "number", description: "Max results" },
+      },
+      required: ["brand"],
+    },
+  },
+  {
+    name: "artifact_get",
+    description: "Fetch a single artifact by uuid (optionally scoped to a brand).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        uuid:  { type: "string", description: "Artifact uuid" },
+        brand: { type: "string", description: "Brand slug (optional; speeds lookup)" },
+      },
+      required: ["uuid"],
+    },
+  },
+  {
+    name: "routertag_validate",
+    description: "Validate a router-tag object against the contract. Returns { valid, errors }.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        routertag: { type: "object", description: "A router-tag: {uuid, brand, vault, switch, title, timestamp, version, source, hash, metadata}" },
+      },
+      required: ["routertag"],
+    },
+  },
+  {
+    name: "vault_registry",
+    description: "List the canonical vault registry (slug, doctrine number, tier, legacy integer, active).",
+    inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "artifact_migrate_legacy",
+    description: "Map existing vault entries → artifacts by slug. DRY-RUN by default; pass dry_run=false to actually write. Existing vault entries keep working regardless.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        brand:   { type: "string", description: "Limit to one brand (optional)" },
+        dry_run: { type: "boolean", description: "Default: true (no writes)" },
+      },
+    },
+  },
 ];
 
 // ─── Server setup ─────────────────────────────────────────────────────────────
@@ -447,6 +524,53 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           limit:    args.limit    ? Number(args.limit)                 : undefined,
         });
         return { content: [{ type: "text", text: JSON.stringify({ count: festivals.length, festivals }, null, 2) }] };
+      }
+
+      // ─── Artifact / Router-Tag Spine (S1/S2) ─────────────────────────────
+      case "artifact_ingest": {
+        const result = ingestArtifact({
+          brand:    String(args.brand),
+          title:    String(args.title),
+          body:     args.body !== undefined ? String(args.body) : undefined,
+          ref:      args.ref !== undefined ? String(args.ref) : undefined,
+          vault:    args.vault !== undefined ? String(args.vault) : undefined,
+          switch:   args.switch !== undefined ? Number(args.switch) : undefined,
+          source:   args.source !== undefined ? (String(args.source) as ArtifactSource) : undefined,
+          metadata: (args.metadata && typeof args.metadata === "object") ? (args.metadata as Record<string, unknown>) : undefined,
+        });
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+
+      case "artifact_list": {
+        const arts = listArtifacts({
+          brand:  String(args.brand),
+          vault:  args.vault !== undefined ? String(args.vault) : undefined,
+          switch: args.switch !== undefined ? Number(args.switch) : undefined,
+          limit:  args.limit !== undefined ? Number(args.limit) : undefined,
+        });
+        return { content: [{ type: "text", text: JSON.stringify({ count: arts.length, artifacts: arts }, null, 2) }] };
+      }
+
+      case "artifact_get": {
+        const art = getArtifact(String(args.uuid), args.brand !== undefined ? String(args.brand) : undefined);
+        return { content: [{ type: "text", text: art ? JSON.stringify(art, null, 2) : `Artifact not found: ${args.uuid}` }], isError: !art };
+      }
+
+      case "routertag_validate": {
+        const result = validateRouterTag((args.routertag ?? {}) as Partial<RouterTag>);
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+
+      case "vault_registry": {
+        return { content: [{ type: "text", text: JSON.stringify(listVaultRegistry(), null, 2) }] };
+      }
+
+      case "artifact_migrate_legacy": {
+        const report = migrateLegacyVaultEntries({
+          brand:  args.brand !== undefined ? String(args.brand) : undefined,
+          dryRun: args.dry_run !== false,
+        });
+        return { content: [{ type: "text", text: JSON.stringify(report, null, 2) }] };
       }
 
       default:
