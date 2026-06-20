@@ -94,32 +94,32 @@ Every task belongs to **exactly one** wave.
 | ~~BLUME-001~~ | 1 | S0 | ~~Scaffold BLUME-MCP server~~ — **OBSOLETE: server already runs (`blume/src/mcp/server.ts`)** | — | DONE |
 | ⭐ BLUME-004 | 1 | S0 | **Reconcile** the two existing servers against this ledger; mark statuses; document `@terravian/blume` migration | — | **DONE** (see §5b Reconciliation Result) |
 | ⭐ BLUME-005 | 1 | S18 | **Doctrine-debt:** retire public `dominion_rex`/`venus_protocol` modes → private-only; set calm-premium house voice (Calm·Premium·Intelligent·Helpful·Strategic) as default | 004 | **DONE** |
-| ⭐ BLUME-002 | 1 | S0 | Connect storage substrate (Supabase `wxinipsficonhfifjqek`, `blume_*`/`sapi_*`) — write+read a row | 001 | TODO |
-| ⭐ BLUME-003 | 1 | S0 | Minimal data model: `artifact(uuid,brand,vault,switch,title,ts,version,source,hash,metadata jsonb)` — migration applied (dev) | 002 | TODO |
-| ⭐ BLUME-010 | 1 | S1 | Artifact ingest tool: accept payload (title, body/ref, brand) → returns uuid | 003 | TODO |
-| ⭐ BLUME-011 | 1 | S1 | Artifact store: persist with hash + timestamp; retrievable by uuid | 010 | TODO |
-| ⭐ BLUME-020 | 1 | S2 | Router-tag schema validator (the contract) — rejects malformed, accepts valid | 003 | TODO |
-| ⭐ BLUME-021 | 1 | S2 | Auto-assign router-tag on ingest (uuid, ts, version, source=BLUME, hash) | 010,020 | TODO |
-| ⭐ BLUME-030 | 1 | S3 | Vault category enum — 12 canonical categories, tiered Core/Extended/Sovereign (matches doctrine) | 003 | TODO |
-| ⭐ BLUME-031 | 1 | S3 | Assign vault/category to artifact (input or default) — artifact.vault ∈ enum | 021,030 | TODO |
+| ⭐ BLUME-002 | 1 | S0 | Storage substrate: local JSON primary + Supabase `thq_artifacts` mirror; DDL in `migrations/0001_artifacts.sql` | 001 | **DONE** (apply DDL to live DB to enable mirror) |
+| ⭐ BLUME-003 | 1 | S0 | Data model: `Artifact{uuid,brand,vault,switch,title,timestamp,version,source,hash,metadata,body,ref,parent_uuid,updated_at}` + `thq_vault_registry` | 002 | **DONE** |
+| ⭐ BLUME-010 | 1 | S1 | Artifact ingest tool: accept payload (title, body/ref, brand) → returns uuid | 003 | **DONE** (`artifact_ingest`) |
+| ⭐ BLUME-011 | 1 | S1 | Artifact store: persist with hash + timestamp; retrievable by uuid | 010 | **DONE** (`artifact_get`) |
+| ⭐ BLUME-020 | 1 | S2 | Router-tag schema validator (the contract) — rejects malformed, accepts valid | 003 | **DONE** (`routertag_validate`) |
+| ⭐ BLUME-021 | 1 | S2 | Auto-assign router-tag on ingest (uuid, ts, version, source, hash) | 010,020 | **DONE** |
+| ⭐ BLUME-030 | 1 | S3 | Vault category registry — 12 canonical slugs, tiered Core/Extended/Sovereign (matches doctrine) | 003 | **DONE** (`vault_registry`) |
+| ⭐ BLUME-031 | 1 | S3 | Assign vault/category to artifact (input or default `creative-drafts`) — artifact.vault ∈ registry | 021,030 | **DONE** |
 | ⭐ BLUME-040 | 1 | S4 | Lotus scoring config: Content/Audience/Offer/Proof/Monetization (0–20 each) | 003 | TODO |
 | ⭐ BLUME-041 | 1 | S4 | Compute per-category score from a brand's artifacts (returns 5 sub-scores) | 031,040 | TODO |
 | ⭐ BLUME-042 | 1 | S4 | Launch Readiness Index = Σ→% with bands (Go ≥85 / Final-Prep / Structuring / Dev) | 041 | TODO |
 | ⭐ BLUME-043 | 1 | S4 | `readiness(brand)` tool: returns readiness % + band + sub-scores | 042 | TODO |
-| BLUME-050 | 2 | S3 | Vault-as-view query: "Vault X" = artifacts WHERE brand AND vault=X | 031 | TODO |
+| BLUME-050 | 2 | S3 | Vault-as-view query: "Vault X" = artifacts WHERE brand AND vault=X | 031 | **DONE** (`artifact_list` vault filter) |
 | BLUME-051 | 2 | S3 | List vaults for a brand with counts | 050 | TODO |
 | BLUME-052 | 2 | S4 | Health Bar data structure (segments + fill %) | 041 | TODO |
 | BLUME-053 | 2 | S4 | Missing-evidence detection (empty/thin categories) | 041 | TODO |
 | BLUME-054 | 2 | S4 | Bottleneck detection (lowest-scoring category) | 041 | TODO |
 | BLUME-055 | 2 | S4 | Tick Maps (milestone ticks → readiness contribution) | 042 | TODO |
-| BLUME-060 | 2 | S11 | Artifact search by brand/vault/switch/text | 031 | TODO |
+| BLUME-060 | 2 | S11 | Artifact search by brand/vault/switch/text | 031 | WIP (brand/vault/switch DONE via `artifact_list`; text search TODO) |
 | BLUME-061 | 2 | S11 | Readiness/vault summary query API | 043,050 | TODO |
 | BLUME-062 | 2 | S16 | Structured logging of ingest/score events | 011 | TODO |
 | BLUME-063 | 2 | S16 | Readiness/vault status surface (tool/CLI output) | 061 | TODO |
 | BLUME-064 | 2 | S10 | Investor-facing readiness summary (sanitized) | 043 | TODO |
 | BLUME-070 | 3 | S12 | Append-only proof-of-commerce audit log (hashed chain, immutable) | 011 | TODO |
 | BLUME-071 | 3 | S12 | Un-backdatable timestamp enforcement | 070 | TODO |
-| BLUME-072 | 3 | S12 | Artifact versioning (immutable originals; v1,v2…) | 011 | TODO |
+| BLUME-072 | 3 | S12 | Artifact versioning (immutable originals; v1,v2…) | 011 | **DONE** (`versionArtifact`, parent lineage) |
 | BLUME-073 | 3 | S1 | Idempotent ingest (dedupe by hash) | 021 | TODO |
 | BLUME-074 | 3 | S2 | Input validation + error contracts across tools | 020 | TODO |
 | BLUME-075 | 3 | S0 | Test suite: spine loop end-to-end | 043 | TODO |
@@ -185,9 +185,9 @@ Every task belongs to **exactly one** wave.
 | Sys | Verdict | Evidence / what's there vs. missing |
 |-----|---------|-------------------------------------|
 | S0 Foundation | **BUILT** | Both MCP servers run (`blume/src/mcp/server.ts`, `terravian-mcp/src/server.ts`). |
-| S1 Artifact Engine | **MISSING** | No artifact module. `VaultEntry` lacks uuid/switch/version/source/hash. |
-| S2 Router-Tag Engine | **MISSING** | No router-tag contract/validator (grep clean). |
-| S3 Vault Engine | **PARTIAL** | 8 CORE vaults built (files + `thq_vault_entries`). Missing 9 R&D / 11 Memory / 12 Library; integers permuted vs doctrine (→ BLUME-032). |
+| S1 Artifact Engine | **BUILT** | `src/artifacts/store.ts` — `artifact_ingest/list/get/version`; uuid + immutable timestamp + version + sha256 hash; local JSON primary + `thq_artifacts` mirror. |
+| S2 Router-Tag Engine | **BUILT** | `src/artifacts/routerTag.ts` — full contract + `routertag_validate`; auto-assigned on ingest. |
+| S3 Vault Engine | **PARTIAL** | Legacy 8-vault store still serves `blume_*vault` tools. NEW canonical **12-slug `thq_vault_registry`** built (artifacts key on slug, integers legacy-compat). Migrating the *vault-entry tools* to 12 = BLUME-032. |
 | S4 Lotus Engine | **MISSING** | ★ No scoring/readiness/health anywhere. The primary objective. |
 | S5 Recommendation | **MISSING** | Only `blume_diagnose_switch` point-advice; no readiness-driven "what next". |
 | S6 Sales Switch | **PARTIAL** | `content/switches.ts` + `blume_diagnose_switch` built. Switch→vault map + LUME/BLUME split not formalized. |
@@ -215,7 +215,18 @@ Every task belongs to **exactly one** wave.
 
 **OBSOLETE:** `BLUME-001` (scaffold server) — both servers already run.
 **In-flight migration:** `terravian-mcp` → standalone `@terravian/blume` package via `adapters/blume.ts` (baby bridge) — **only `listBrands` migrated so far;** all other BLUME tools still use local `agents/blume/`. Finish the extraction during build, don't fork.
-**Net:** the two MISSING keystones (S1/S2 Spine, S4 Lotus) are confirmed by code as the real remaining work. Almost all "infra" (S20–S27) and the generation/publishing surface are BUILT.
+**Net (updated):** **S1/S2 Artifact Spine is now BUILT** (see §5c). The **only remaining keystone is S4 Lotus** — and the Spine was built specifically so Lotus can be built immediately next.
+
+---
+
+## 5c. Artifact / Router-Tag Spine — Build Result (2026-06-19)
+**Module:** `blume/src/artifacts/` — `types.ts` · `registry.ts` · `routerTag.ts` · `store.ts` · `migrate.ts`. DDL: `migrations/0001_artifacts.sql`. Tools wired in `src/mcp/server.ts`.
+**Contract shipped:** `{uuid, brand, vault(slug), switch, title, timestamp, version, source, hash, metadata}` (+ artifact payload `body/ref/parent_uuid/updated_at`).
+**MCP tools:** `artifact_ingest` · `artifact_list` · `artifact_get` · `routertag_validate` · `vault_registry` · `artifact_migrate_legacy`.
+**Storage:** local JSON primary (`./vaults/_artifacts/<brand>/<uuid>.json`) + `thq_artifacts` Supabase mirror; canonical `thq_vault_registry` (12 slugs, integers legacy-compat).
+**Verified:** `tsc --noEmit` clean + 18/18 runtime assertions (`scripts/spine-smoke.ts`): uuid/timestamp/version/hash assignment, vault & switch filters, uuid round-trip, immutable versioning, malformed-tag rejection, 12-vault registry.
+**Legacy safety:** vault system untouched; `artifact_migrate_legacy` is **dry-run by default** (no full migration performed). No breaking changes.
+**Lotus-ready:** `artifact_list(brand, vault?, switch?)` returns exactly what `lotus_readiness(brand)` needs (spec §8 hand-off test satisfied).
 
 ---
 

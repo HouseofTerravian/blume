@@ -1,20 +1,22 @@
 # BLUME — NEXT ACTION
 *The single next task. Do this, then update CURRENT_STATE + COMPLETED + this file.*
 
-## ▶ Artifact / Router-Tag Spine (S1/S2) — the substrate for Lotus
-**Wave:** 1 · **Systems:** S1 Artifact Engine + S2 Router-Tag Engine · **Deps:** BLUME-004/005 (DONE)
-**Spec:** `build/ARTIFACT_SPINE_SPEC_v1.md` (build-ready — no further doctrine phase).
+## ▶ LOTUS ENGINE (S4) — `lotus_readiness(brand)` = MILESTONE: FIRST LOTUS SCORE
+**Wave:** 1 · **System:** S4 Lotus Engine · **Deps:** Artifact Spine (DONE)
+**Spec:** `build/LOTUS_ENGINE_SPEC_v1.md` · **Milestone:** `build/MILESTONE_FIRST_LOTUS_SCORE.md`
 
-**Why now:** Lotus reads artifacts; the Spine must exist first. This is the last thing between BLUME and the FIRST LOTUS SCORE milestone.
+**The Spine is ready.** `artifact_list(brand, vault?, switch?)` is live and returns the full router-tag contract — exactly Lotus's input (spec §8 hand-off satisfied). Lotus owns no storage; it reads artifacts and scores.
 
-**Minimum to satisfy the milestone path:**
-- `thq_artifacts` table + `thq_vault_registry` (canonical vault slugs; integers legacy-compat). Storage prefix is **`thq_`** (matches live).
-- Router-tag contract `{uuid, brand, vault, switch, title, timestamp, version, source, hash, metadata}` + a validator.
-- Tools: `artifact_ingest` (auto-assign uuid/ts/version/hash/source + validate) and `artifact_list(brand, vault?, switch?)` — the exact call Lotus needs.
-- (Per spec) `artifact_get`, `routertag_validate`, `vault_registry`; `artifact_migrate_legacy` (backfill `thq_vault_entries` by slug) can follow.
+**Minimum to hit the milestone:**
+- Scoring config (rubric): 5 categories × 20 = `Content · Audience · Offer · Proof · Monetization`, mapped to artifact sources (vault slug / switch) per Lotus spec §3 table.
+- `lotus_readiness(brand)` → `{ percent, band, subScores{content,audience,offer,proof,monetization} }`.
+- Bands: `Go ≥85 · Final-Prep 70–84 · Structuring 50–69 · Dev <50`.
+- Reads via `listArtifacts({ brand, vault, switch })` from `src/artifacts/store.ts`.
 
-**Done when:** `artifact_ingest` returns a valid router-tagged artifact and `artifact_list(brand,…)` returns it back — i.e. Lotus has a sufficient substrate (spec §8 success criteria).
+**Done when:** a brand with seeded artifacts gets all 5 sub-scores + Launch Readiness Index from one `lotus_readiness` call. **That is the storage→intelligence crossing.**
 
-**Then:** Lotus Engine (S4) → **MILESTONE: FIRST LOTUS SCORE** → vault migration 8→12 (BLUME-032).
+**Defer (post-milestone Wave 2, do NOT build now):** Health Bar, missing-evidence, bottleneck, Tick Maps, investor summary, recommendation engine.
 
-**Guardrails:** Doctrine + taxonomy FROZEN (ADR-004). Gate any new idea with *"Does this accelerate Lotus?"* — else defer. Don't touch Lotus until the Spine is done.
+**To seed test data:** `artifact_ingest` a few artifacts across vaults/switches for a brand, or `artifact_migrate_legacy({ brand, dryRun:false })` to backfill existing vault entries.
+
+**Guardrails:** Doctrine + taxonomy FROZEN (ADR-004). Gate every decision with *"Does this accelerate First Lotus Score?"* — else defer. Build only what `lotus_readiness` requires.

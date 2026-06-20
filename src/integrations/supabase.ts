@@ -91,6 +91,66 @@ export async function dbGetVaultSummary(brand: string): Promise<Record<string, n
   return summary;
 }
 
+// ─── Artifacts (Router-Tag Spine, thq_artifacts) ─────────────────────────────
+
+export interface DbArtifact {
+  uuid: string;
+  brand: string;
+  vault: string;                 // canonical slug
+  switch: number | null;
+  title: string;
+  body: string | null;
+  ref: string | null;
+  source: string;
+  version: number;
+  parent_uuid: string | null;
+  hash: string;
+  timestamp: string;
+  updated_at: string;
+  metadata: Record<string, unknown>;
+}
+
+export async function dbSaveArtifact(a: DbArtifact): Promise<DbArtifact | null> {
+  const sb = getSupabase();
+  if (!sb) return null;
+
+  const { data, error } = await sb
+    .from("thq_artifacts")
+    .upsert(a)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("[Supabase] Artifact save error:", error.message);
+    return null;
+  }
+  return data as DbArtifact;
+}
+
+export async function dbListArtifacts(filters: {
+  brand: string;
+  vault?: string;
+  switch?: number | null;
+  limit?: number;
+}): Promise<DbArtifact[]> {
+  const sb = getSupabase();
+  if (!sb) return [];
+
+  let query = sb.from("thq_artifacts").select("*").eq("brand", filters.brand);
+  if (filters.vault) query = query.eq("vault", filters.vault);
+  if (filters.switch !== undefined && filters.switch !== null) query = query.eq("switch", filters.switch);
+
+  const { data, error } = await query
+    .order("timestamp", { ascending: false })
+    .limit(filters.limit ?? 500);
+
+  if (error) {
+    console.error("[Supabase] Artifact list error:", error.message);
+    return [];
+  }
+  return (data ?? []) as DbArtifact[];
+}
+
 // ─── Op Task Creation (pipeline chaining only) ───────────────────────────────
 
 export interface CreateTaskInput {
