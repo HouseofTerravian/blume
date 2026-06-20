@@ -79,7 +79,7 @@ export async function dbGetVaultSummary(brand: string): Promise<Record<string, n
   if (!sb) return {};
 
   const summary: Record<string, number> = {};
-  for (let v = 1; v <= 8; v++) {
+  for (let v = 1; v <= 12; v++) {
     const { count, error } = await sb
       .from("thq_vault_entries")
       .select("*", { count: "exact", head: true })

@@ -8,8 +8,12 @@ import path from "path";
 import { config } from "../config.js";
 import { isSupabaseEnabled, dbSaveVaultEntry, dbReadVault, dbGetVaultSummary } from "../integrations/supabase.js";
 import type { DbVaultEntry } from "../integrations/supabase.js";
-import { VAULT_NAMES } from "./types.js";
+import { VAULT_NAMES, ACTIVE_VAULTS } from "./types.js";
 import type { VaultNumber, VaultEntry } from "./types.js";
+
+const ALL_VAULTS: VaultNumber[] = (Object.keys(VAULT_NAMES) as string[])
+  .map(n => Number(n) as VaultNumber)
+  .sort((a, b) => a - b);
 
 function getBrandVaultDir(brand: string): string {
   return path.join(config.vault.root, brand);
@@ -24,10 +28,10 @@ function ensureDir(dir: string): void {
 }
 
 export function initBrandVaults(brand: string): void {
-  for (let v = 1; v <= 8; v++) {
-    ensureDir(getVaultDir(brand, v as VaultNumber));
+  for (const v of ACTIVE_VAULTS) {
+    ensureDir(getVaultDir(brand, v));
   }
-  console.log(`[Vault] Initialized all 8 vaults for brand: ${brand}`);
+  console.log(`[Vault] Initialized ${ACTIVE_VAULTS.length} active vaults for brand: ${brand}`);
 }
 
 export function saveToVault(
@@ -122,7 +126,7 @@ export function searchVaults(
   vault?: VaultNumber
 ): VaultEntry[] {
   const lower = query.toLowerCase();
-  const vaults: VaultNumber[] = vault ? [vault] : ([1, 2, 3, 4, 5, 6, 7, 8] as VaultNumber[]);
+  const vaults: VaultNumber[] = vault ? [vault] : ALL_VAULTS;
   const results: VaultEntry[] = [];
 
   for (const v of vaults) {
@@ -143,9 +147,8 @@ export function searchVaults(
 
 export function getBrandVaultSummary(brand: string): Record<string, number> {
   const summary: Record<string, number> = {};
-  for (let v = 1; v <= 8; v++) {
-    const vaultNum = v as VaultNumber;
-    summary[`vault-${v}-${VAULT_NAMES[vaultNum]}`] = readVault(brand, vaultNum).length;
+  for (const v of ALL_VAULTS) {
+    summary[`vault-${v}-${VAULT_NAMES[v]}`] = readVault(brand, v).length;
   }
 
   if (isSupabaseEnabled()) {

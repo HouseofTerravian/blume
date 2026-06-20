@@ -144,7 +144,7 @@ const TOOLS: Tool[] = [
   },
   {
     name: "blume_add_brand",
-    description: "Register a new brand in BLUME. Creates the brand profile JSON and initializes 8 vaults.",
+    description: "Register a new brand in BLUME. Creates the brand profile JSON and initializes its vaults.",
     inputSchema: {
       type: "object",
       properties: {
@@ -179,7 +179,7 @@ const TOOLS: Tool[] = [
   },
   {
     name: "blume_init_vaults",
-    description: "Initialize all 8 vaults for a brand.",
+    description: "Initialize the active vaults (canonical 12-vault taxonomy) for a brand.",
     inputSchema: {
       type: "object",
       properties: { brand: { type: "string" } },
@@ -188,7 +188,7 @@ const TOOLS: Tool[] = [
   },
   {
     name: "blume_vault_summary",
-    description: "Returns a count of entries in each of the 8 vaults for a brand.",
+    description: "Returns a count of entries in each of the 12 canonical vaults for a brand.",
     inputSchema: {
       type: "object",
       properties: { brand: { type: "string" } },
@@ -202,7 +202,7 @@ const TOOLS: Tool[] = [
       type: "object",
       properties: {
         brand: { type: "string" },
-        vault: { type: "number", minimum: 1, maximum: 8 },
+        vault: { type: "number", minimum: 1, maximum: 12 },
         limit: { type: "number" },
       },
       required: ["brand", "vault"],
@@ -215,7 +215,7 @@ const TOOLS: Tool[] = [
       type: "object",
       properties: {
         brand: { type: "string" },
-        vault: { type: "number", minimum: 1, maximum: 8 },
+        vault: { type: "number", minimum: 1, maximum: 12 },
         title: { type: "string" },
         content: { type: "string" },
         tags: { type: "array", items: { type: "string" } },
@@ -231,7 +231,7 @@ const TOOLS: Tool[] = [
       properties: {
         brand: { type: "string" },
         query: { type: "string" },
-        vault: { type: "number", minimum: 1, maximum: 8 },
+        vault: { type: "number", minimum: 1, maximum: 12 },
         limit: { type: "number" },
       },
       required: ["brand", "query"],
@@ -512,7 +512,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "blume_init_vaults": {
         initBrandVaults(String(args.brand));
-        return { content: [{ type: "text", text: `All 8 vaults initialized for brand: ${args.brand}` }] };
+        return { content: [{ type: "text", text: `Active vaults initialized for brand: ${args.brand}` }] };
       }
 
       case "blume_vault_summary": {

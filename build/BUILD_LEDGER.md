@@ -165,7 +165,7 @@ Every task belongs to **exactly one** wave.
 | BLUME-224 | 5 | S19 | Landing page generation | 201 | TODO |
 | BLUME-152 | 5 | S13 | Social scheduling + posting | 150,201 | **DONE** (terravian-mcp scheduler+daemon) |
 | BLUME-153 | 5 | S13 | Multi-channel distribution (social + email) | 152,223 | WIP (social done; email handler exists) |
-| BLUME-032 | 1 | S3 | **Vault enum migration 8→12**: add 9 R&D, 11 Memory, 12 Library (Sovereign); 10 Compliance PARKED. CORE 1–8 already match. | 030 | TODO |
+| BLUME-032 | 1 | S3 | **Vault enum migration 8→12**: add 9 R&D, 11 Memory, 12 Library (Sovereign); 10 Compliance PARKED. CORE 1–8 already match. | 030 | **DONE** (vault module derives from registry; §5k) |
 | BLUME-230 | — | S20 | Event Bus — adopt `terravian-mcp/src/events` | — | **DONE/ADOPT** |
 | BLUME-231 | — | S21 | Job Queue & Daemon — adopt `terravian-mcp/src/queue` + handlers | — | **DONE/ADOPT** |
 | BLUME-232 | — | S22 | Workflow Engine — adopt `terravian-mcp/src/workflows` | — | **DONE/ADOPT** |
@@ -187,7 +187,7 @@ Every task belongs to **exactly one** wave.
 | S0 Foundation | **BUILT** | Both MCP servers run (`blume/src/mcp/server.ts`, `terravian-mcp/src/server.ts`). |
 | S1 Artifact Engine | **BUILT** | `src/artifacts/store.ts` — `artifact_ingest/list/get/version`; uuid + immutable timestamp + version + sha256 hash. **`listArtifacts` Supabase-first + local fallback (read).** **`artifact_ingest` is read-after-write: awaits the live mirror; success only when the row is in `thq_artifacts` (Supabase enabled); local-only when disabled.** |
 | S2 Router-Tag Engine | **BUILT** | `src/artifacts/routerTag.ts` — full contract + `routertag_validate`; auto-assigned on ingest. |
-| S3 Vault Engine | **PARTIAL** | Legacy 8-vault store still serves `blume_*vault` tools. NEW canonical **12-slug `thq_vault_registry`** built (artifacts key on slug, integers legacy-compat). Migrating the *vault-entry tools* to 12 = BLUME-032. |
+| S3 Vault Engine | **BUILT** | Vault module now derives from the canonical **12-vault registry** (BLUME-032): slug canonical, integers legacy-compat (1–8 preserve meaning, 9 R&D/11 Memory/12 Library added, 10 Compliance parked). Artifact spine + vault tools share one taxonomy. |
 | S4 Lotus Engine | **BUILT (readiness + guidance)** | ★ `src/lotus/` — `lotus_readiness` (C/A/O/P/M + Index + band) + **`lotus_bottleneck` + `lotus_missing_evidence`** (Wave-2 depth: score→guidance). **MILESTONE: FIRST LOTUS SCORE achieved.** Still deferred: Health Bar / Tick Maps / investor summary. |
 | S5 Recommendation | **BUILT** | `src/recommend/` — `recommend_next` composes Lotus (readiness+bottleneck+missing-evidence) + 7 Sales Switches → prioritized, switch-aware action plan + headline + primary action. (Memory-compounded recs BLUME-082 still blocked on S8.) |
 | S6 Sales Switch | **PARTIAL** | `content/switches.ts` + `blume_diagnose_switch` built. Switch→vault map + LUME/BLUME split not formalized. |
@@ -289,6 +289,16 @@ Run: `VAULT_ROOT=./.acceptance npx tsx scripts/acceptance.ts` (Supabase enabled 
 - **Wiring (terravian-mcp, `src/proof/emit.ts` best-effort):** called at every confirmation boundary — immediate `generateAndTweet`/`generateAndPost` and scheduler `firePost` (gateway `platform_post_id`/`platform_url` + Twitter `id`/`url`). A proof-write failure logs but never breaks an already-live publish.
 **Boundary preserved:** no change to Lotus scoring, Recommendation, taxonomy, doctrine, read-after-write, caching, or the existing acceptance architecture.
 **Acceptance (`scripts/proof-acceptance.ts`):** **PASS 14/14** — intent→null; confirmed→artifact with source/vault/platform/external-id/url/timestamp/account/hash + intact router-tag; **Lotus sees the evidence via the live Supabase read path (local wiped, no polling)**. Plus terravian-mcp `proof-wire-smoke` 3/3 (cross-package resolution + intent guard). Self-cleaning; 0 residual.
+
+---
+
+## 5k. BLUME-032 — Vault enum migration 8→12 (2026-06-20)
+**Done:** the legacy vault module (`src/vault/`) now **derives from the canonical 12-vault registry** (`artifacts/registry.ts`) — one taxonomy for both the artifact spine and the vault-entry tools.
+- **Slug canonical; integers legacy-compat.** 1–8 keep their original meaning (keyed by `registry.legacy_int`), so `logPost`→1 (published-works), `logProofOfUse`→2 (proof-of-use), `logCommerceEvent`→3 (commerce-evidence) are unchanged. Names aligned to canonical (5 `legal`, 8 `investor`).
+- **Added 9 R&D · 11 Memory · 12 Library** (sovereign); **10 Compliance parked** — `ACTIVE_VAULTS` (11) excludes it, so `initBrandVaults` skips it.
+- `VAULT_NAMES`/`VAULT_DESCRIPTIONS`/`ACTIVE_VAULTS` derived; `initBrandVaults`/`getBrandVaultSummary`/`searchVaults` + `dbGetVaultSummary` span 12; blume + terravian-mcp vault MCP tool ranges/descriptions → 1–12.
+- **Live `thq_vault_entries` was empty → no data migration.** No breaking changes (integer API preserved; terravian-mcp consumes via the package shim).
+**Verified:** tsc clean both repos; `scripts/vault-migration-smoke.ts` **17/17** (12 vaults, canonical slugs, legacy meaning preserved, new vaults usable, compliance not initialized). No regression — proof-acceptance 14/14, main acceptance LIVE 10/10 + OFFLINE 8/8.
 
 ---
 
