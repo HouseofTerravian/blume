@@ -14,4 +14,6 @@
 
 - S17→Spine · 2026-06-20 · (this commit) · Generators wired to `artifact_ingest` — Lotus runs LIVE. `src/content/ingestGenerated.ts` + generator.ts/seo.ts. Drafts→Creative Drafts, approved→Published Works; best-effort (never breaks generation). Closes BLUME-200/202. Live test 6/6: real generatePost → artifact → lotus 0%→5%.
 
+- EXTRACT · 2026-06-20 · (this commit) · `@terravian/blume` extraction — deduped persona/switches/seo/vault in terravian-mcp to re-export shims (~627 lines → ~55); logic now lives once in the package. Added `resolvePublicMode`+mode consts to blume `index.ts` exports; declared `@terravian/blume: file:../blume`. tsc clean both repos; 8/8 runtime boundary check. Generation orchestration + brand store stay local (behavior-preserving).
+
 *(Next: Wave-2 Lotus depth and/or BLUME-032 vault migration — Chude's call.)*

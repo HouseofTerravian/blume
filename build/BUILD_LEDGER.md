@@ -57,7 +57,7 @@
 ---
 
 ## ⚠️ RE-BASELINE (2026-06-19) — BLUME is ALREADY BUILT, not greenfield
-This ledger was first drafted assuming a blank slate. **Coverage audit (`COVERAGE_REPORT_v1.md`) proved otherwise:** two working MCP servers exist — **`blume/` = BLUME-MCP** (generation, 8 CORE vaults, 26 brands, search, festivals) and **`terravian-mcp/` = Terravian-MCP** (BLUME adapter, social gateway, scheduler+daemon, events, queue, workflows, observability, approvals). The doctrine's BLUME-MCP↔Terravian-MCP split is **real and mid-migration** (`terravian-mcp/src/adapters/blume.ts` → `@terravian/blume`).
+This ledger was first drafted assuming a blank slate. **Coverage audit (`COVERAGE_REPORT_v1.md`) proved otherwise:** two working MCP servers exist — **`blume/` = BLUME-MCP** (generation, 8 CORE vaults, 26 brands, search, festivals) and **`terravian-mcp/` = Terravian-MCP** (BLUME adapter, social gateway, scheduler+daemon, events, queue, workflows, observability, approvals). The doctrine's BLUME-MCP↔Terravian-MCP split is **real** — and terravian-mcp now consumes BLUME's pure modules through the `@terravian/blume` package boundary (persona/switches/seo/vault deduped; see §5b "Migration").
 **So `BLUME-001` (scaffold server) is OBSOLETE.** True Wave-1 order: **BLUME-004 (reconcile) → BLUME-005 (voice cleanup) → S1/S2 artifact+router-tag spine → S4 Lotus (040–043) → BLUME-032 (8→12 vaults).** Lotus + the artifact/router-tag spine are the genuine gaps; most "infra" is built (S20–S27).
 
 **📐 ACTIVE SPECS (build-ready, no further doctrine phase needed):**
@@ -214,7 +214,7 @@ Every task belongs to **exactly one** wave.
 | S27 Signals | **PARTIAL** | `blume/src/signals` types+index only; scope undefined. |
 
 **OBSOLETE:** `BLUME-001` (scaffold server) — both servers already run.
-**In-flight migration:** `terravian-mcp` → standalone `@terravian/blume` package via `adapters/blume.ts` (baby bridge) — **only `listBrands` migrated so far;** all other BLUME tools still use local `agents/blume/`. Finish the extraction during build, don't fork.
+**Migration (2026-06-20 — substantially done):** `terravian-mcp` now consumes BLUME through the **`@terravian/blume` package boundary** for the pure modules — **`agents/blume/persona.ts`, `switches.ts`, `seo.ts`, `vault.ts` are re-export shims** (logic deduped to the package; ~627 duplicated lines → ~55). Declared `@terravian/blume: file:../blume` in `terravian-mcp/package.json`; resolves via the `node_modules/@terravian/blume → blume` symlink consuming `blume/dist`. **Remaining local by design (not practical without behavior change):** `agents/blume/index.ts` generation orchestration (terravian-mcp's own `think` + brand store + gateway/tweet posting), `memory/brands.ts`, `cli.ts`. Verified: tsc clean both repos + 8/8 runtime boundary check (`terravian-mcp/scripts/extract-smoke.ts`).
 **Net (updated):** **Both keystones BUILT** — S1/S2 Artifact Spine (§5c) and **S4 Lotus readiness (§5d)**. **MILESTONE: FIRST LOTUS SCORE achieved — BLUME has crossed from storage system to intelligence system.** Remaining is Wave-2 depth (Lotus polish, recommendations) + cleanups (8→12 vault-tool migration).
 
 ---
