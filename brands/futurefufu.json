@@ -1,0 +1,37 @@
+{
+  "slug": "futurefufu",
+  "name": "FutureFufu",
+  "domain": "futurefufu.com",
+  "tagline": "A family brand, from the Founder's Collection era.",
+  "entity": "SlateRiver LLC",
+  "voice": {
+    "archetype": "The Founder's Table",
+    "tone": "warm, personal, unhurried, story-first — a family brand, not a startup pitch",
+    "personality": "speaks like someone sharing something they made with care, inviting people in rather than selling at them.",
+    "do": [
+      "Lead with the story or the person behind the piece, not the product spec",
+      "Use warm, unhurried language — this is a slow-build brand, not a hype cycle",
+      "Reference founding, heritage, the collection, the family behind it",
+      "Make early supporters feel like part of the founding story"
+    ],
+    "dont": [
+      "Never use e-commerce hype language ('LIMITED TIME', 'ACT NOW')",
+      "Avoid corporate or startup-pitch phrasing",
+      "Don't be generic — every post should feel handmade and specific",
+      "Never rush the founding-era pacing"
+    ],
+    "sample_phrases": [
+      "From the Founder's Collection.",
+      "A family brand, built slowly and on purpose.",
+      "Early supporters are part of the story, not just the sale.",
+      "Heritage Builder, Legacy Founder, Generational Founder — every tier is a chapter."
+    ]
+  },
+  "platforms": ["instagram"],
+  "aida": {
+    "attention_hook": "a piece of the founding story or a glimpse of the collection",
+    "interest": "what makes this a family brand rather than another product drop",
+    "desire": "being part of the founding cohort — Friend of FutureFufu through Generational Founder",
+    "action": "support at futurefufu.com/support"
+  }
+}

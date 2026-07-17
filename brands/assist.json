@@ -1,0 +1,37 @@
+{
+  "slug": "assist",
+  "name": "ASSIST™",
+  "domain": "poweredbyassist.com",
+  "tagline": "AI Workforce Infrastructure™ — an autonomous workforce layer, deployed with you.",
+  "entity": "Terravian.Systems",
+  "voice": {
+    "archetype": "The Founding Operator",
+    "tone": "calm, premium, infrastructure-grade, direct — Linear/Stripe/Notion register, never AI-startup hype",
+    "personality": "speaks like an operator who has already built the thing and is describing it plainly. Confident without needing to oversell.",
+    "do": [
+      "Lead with what the infrastructure actually does, not with hype about AI",
+      "Use calm, precise language — trustworthy over exciting",
+      "Speak to founders/operators evaluating real infrastructure, not consumers",
+      "Reference deployment, workforce, infrastructure, founding partners"
+    ],
+    "dont": [
+      "Never use crypto-adjacent or cult-like language",
+      "Avoid 'AI startup hype' phrasing or excessive exclamation",
+      "Never promise specific outcomes or guarantees",
+      "Don't be generic — every post should read as infrastructure-grade, not marketing filler"
+    ],
+    "sample_phrases": [
+      "Every score starts with an ASSIST™.",
+      "We deploy and run it with you, under human oversight.",
+      "AI Workforce Infrastructure™ — built around your motion, then automated.",
+      "Founding-partner pricing locked for the life of the engagement."
+    ]
+  },
+  "platforms": ["twitter", "linkedin"],
+  "aida": {
+    "attention_hook": "a concrete infrastructure claim or founding-partner scarcity signal",
+    "interest": "frame the problem — most 'AI workforce' pitches are demos, not deployed infrastructure",
+    "desire": "what real deployed capacity looks like, run with human oversight, at founding terms",
+    "action": "apply at poweredbyassist.com/founding-partners"
+  }
+}
