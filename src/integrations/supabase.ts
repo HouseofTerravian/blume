@@ -12,7 +12,9 @@ export function getSupabase(): SupabaseClient | null {
   if (_client) return _client;
 
   const url = process.env.SUPABASE_URL ?? "";
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_ANON_KEY ?? "";
+  // Server-side only: the thq_* tables are RLS-locked, so only the server (sb_secret_) key works.
+  // No public/anon fallback: a missing key must disable Supabase, not silently use a dead key.
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 
   if (!url || !key) return null;
 
