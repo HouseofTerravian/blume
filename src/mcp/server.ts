@@ -56,6 +56,7 @@ const TOOLS: Tool[] = [
         data_type: { type: "string", enum: ["TIMESERIES", "GEO_MAP", "RELATED_QUERIES", "RELATED_TOPICS"], description: "Default: TIMESERIES" },
         geo: { type: "string", description: "Region code, e.g. 'US' or 'US-TX'. Default: worldwide" },
         date: { type: "string", description: "e.g. 'today 1-m', 'today 3-m', 'today 12-m', 'now 7-d'. Default: today 12-m" },
+        save: { type: "boolean", description: "If true, store the untouched response as an immutable House-level raw signal in the rnd vault. Default: false" },
       },
       required: ["q"],
     },
@@ -69,7 +70,8 @@ const TOOLS: Tool[] = [
         q: { type: "string", description: "Search query / keyword" },
         engine: { type: "string", enum: ["google", "google_events", "google_maps", "youtube", "google_news"], description: "Default: google" },
         location: { type: "string", description: "e.g. 'Austin, Texas, United States'" },
-        num: { type: "number", description: "Max results to return (default 10)" },
+        num: { type: "number", description: "Max results to return (default 10, capped at 20)" },
+        save: { type: "boolean", description: "If true, store the untouched response as an immutable House-level raw signal in the rnd vault. Default: false" },
       },
       required: ["q"],
     },
@@ -455,6 +457,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           dataType: (args.data_type as TrendsDataType) ?? "TIMESERIES",
           geo:      args.geo ? String(args.geo) : undefined,
           date:     args.date ? String(args.date) : undefined,
+          save:     args.save === true,
         });
         return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }] };
       }
@@ -465,6 +468,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           engine:   (args.engine as SerpEngine) ?? "google",
           location: args.location ? String(args.location) : undefined,
           num:      Number(args.num ?? 10),
+          save:     args.save === true,
         });
         return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }] };
       }
