@@ -41,7 +41,8 @@ import type { ArtifactSource, RouterTag } from "../artifacts/types.js";
 import { computeReadiness, getLotusConfig, detectBottleneck, detectMissingEvidence } from "../lotus/engine.js";
 import { recommend } from "../recommend/engine.js";
 
-import { serpSearch, trendsSearch, type SerpEngine, type TrendsDataType } from "../signals/sources/serp.js";
+import { serpSearch, trendsSearch } from "../signals/sources/serp.js";
+import { redactArtifactForRead, redactText } from "../signals/policy.js";
 
 // ─── Tool definitions ─────────────────────────────────────────────────────────
 
@@ -56,7 +57,7 @@ const TOOLS: Tool[] = [
         data_type: { type: "string", enum: ["TIMESERIES", "GEO_MAP", "RELATED_QUERIES", "RELATED_TOPICS"], description: "Default: TIMESERIES" },
         geo: { type: "string", description: "Region code, e.g. 'US' or 'US-TX'. Default: worldwide" },
         date: { type: "string", description: "e.g. 'today 1-m', 'today 3-m', 'today 12-m', 'now 7-d'. Default: today 12-m" },
-        save: { type: "boolean", description: "If true, archive a sanitized, immutable House-level raw signal in the rnd vault (policy tpig-sanitize-1: provider capability URLs redacted). Default: false" },
+        save: { type: "boolean", description: "If true, archive a sanitized, immutable House-level raw signal in the rnd vault (policy tpig-sanitize-2: credentials and provider capability URLs redacted; queries are screened for personal identifiers first). Default: false" },
       },
       required: ["q"],
     },
@@ -71,7 +72,7 @@ const TOOLS: Tool[] = [
         engine: { type: "string", enum: ["google", "google_events", "google_maps", "youtube", "google_news"], description: "Default: google" },
         location: { type: "string", description: "e.g. 'Austin, Texas, United States'" },
         num: { type: "number", description: "Max results to return (default 10, capped at 20)" },
-        save: { type: "boolean", description: "If true, archive a sanitized, immutable House-level raw signal in the rnd vault (policy tpig-sanitize-1: provider capability URLs redacted). Default: false" },
+        save: { type: "boolean", description: "If true, archive a sanitized, immutable House-level raw signal in the rnd vault (policy tpig-sanitize-2: credentials and provider capability URLs redacted; queries are screened for personal identifiers first). Default: false" },
       },
       required: ["q"],
     },
@@ -453,10 +454,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     switch (name) {
       case "signal_google_trends": {
         const out = await trendsSearch({
-          q:        String(args.q),
-          dataType: (args.data_type as TrendsDataType) ?? "TIMESERIES",
-          geo:      args.geo ? String(args.geo) : undefined,
-          date:     args.date ? String(args.date) : undefined,
+          q:        args.q,
+          dataType: args.data_type,
+          geo:      args.geo,
+          date:     args.date,
           save:     args.save === true,
         });
         return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }] };
@@ -464,10 +465,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case "signal_serp_search": {
         const out = await serpSearch({
-          q:        String(args.q),
-          engine:   (args.engine as SerpEngine) ?? "google",
-          location: args.location ? String(args.location) : undefined,
-          num:      Number(args.num ?? 10),
+          q:        args.q,
+          engine:   args.engine,
+          location: args.location,
+          num:      args.num,
           save:     args.save === true,
         });
         return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }] };
@@ -649,12 +650,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           switch: args.switch !== undefined ? Number(args.switch) : undefined,
           limit:  args.limit !== undefined ? Number(args.limit) : undefined,
         });
-        return { content: [{ type: "text", text: JSON.stringify({ count: arts.length, artifacts: arts }, null, 2) }] };
+        return { content: [{ type: "text", text: JSON.stringify({ count: arts.length, artifacts: arts.map(redactArtifactForRead) }, null, 2) }] };
       }
 
       case "artifact_get": {
         const art = getArtifact(String(args.uuid), args.brand !== undefined ? String(args.brand) : undefined);
-        return { content: [{ type: "text", text: art ? JSON.stringify(art, null, 2) : `Artifact not found: ${args.uuid}` }], isError: !art };
+        return { content: [{ type: "text", text: art ? JSON.stringify(redactArtifactForRead(art), null, 2) : `Artifact not found: ${args.uuid}` }], isError: !art };
       }
 
       case "routertag_validate": {
@@ -701,7 +702,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error(`Unknown tool: ${name}`);
     }
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
+    const message = redactText(err instanceof Error ? err.message : String(err)).text;
     return { content: [{ type: "text", text: `[BLUME ERROR] ${message}` }], isError: true };
   }
 });

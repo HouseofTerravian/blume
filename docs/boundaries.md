@@ -57,6 +57,7 @@ BLUME is the canonical owner of all generation logic, brand logic, vault logic, 
 - YouTube ingestion
 - News ingestion
 - Manual signal submission
+- Query and PII policy for all provider retrievals: see `docs/doctrine/tpig-query-and-pii-policy.md` (canonical; enforced in `src/signals/policy.ts`)
 
 ### MCP Surface
 - Standalone MCP server exposing all BLUME tools
