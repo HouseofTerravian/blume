@@ -41,9 +41,39 @@ import type { ArtifactSource, RouterTag } from "../artifacts/types.js";
 import { computeReadiness, getLotusConfig, detectBottleneck, detectMissingEvidence } from "../lotus/engine.js";
 import { recommend } from "../recommend/engine.js";
 
+import { serpSearch, trendsSearch, type SerpEngine, type TrendsDataType } from "../signals/sources/serp.js";
+
 // ─── Tool definitions ─────────────────────────────────────────────────────────
 
 const TOOLS: Tool[] = [
+  {
+    name: "signal_google_trends",
+    description: "Google Trends via SerpAPI: interest over time, regional breakdown, or related/rising queries and topics for a keyword. Use to pick what a brand should post about now.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        q: { type: "string", description: "Keyword (comma-separate up to 5 to compare, TIMESERIES/GEO_MAP only)" },
+        data_type: { type: "string", enum: ["TIMESERIES", "GEO_MAP", "RELATED_QUERIES", "RELATED_TOPICS"], description: "Default: TIMESERIES" },
+        geo: { type: "string", description: "Region code, e.g. 'US' or 'US-TX'. Default: worldwide" },
+        date: { type: "string", description: "e.g. 'today 1-m', 'today 3-m', 'today 12-m', 'now 7-d'. Default: today 12-m" },
+      },
+      required: ["q"],
+    },
+  },
+  {
+    name: "signal_serp_search",
+    description: "Search live public signals via SerpAPI: Google web, events, maps/local, YouTube, or news. Returns raw results for BLUME to turn into content and listings.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        q: { type: "string", description: "Search query / keyword" },
+        engine: { type: "string", enum: ["google", "google_events", "google_maps", "youtube", "google_news"], description: "Default: google" },
+        location: { type: "string", description: "e.g. 'Austin, Texas, United States'" },
+        num: { type: "number", description: "Max results to return (default 10)" },
+      },
+      required: ["q"],
+    },
+  },
   {
     name: "blume_generate_post",
     description: "BLUME generates a social media post for a brand. Supports all platforms, AIDA stages, and BLUME modes.",
@@ -419,6 +449,26 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     switch (name) {
+      case "signal_google_trends": {
+        const out = await trendsSearch({
+          q:        String(args.q),
+          dataType: (args.data_type as TrendsDataType) ?? "TIMESERIES",
+          geo:      args.geo ? String(args.geo) : undefined,
+          date:     args.date ? String(args.date) : undefined,
+        });
+        return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }] };
+      }
+
+      case "signal_serp_search": {
+        const out = await serpSearch({
+          q:        String(args.q),
+          engine:   (args.engine as SerpEngine) ?? "google",
+          location: args.location ? String(args.location) : undefined,
+          num:      Number(args.num ?? 10),
+        });
+        return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }] };
+      }
+
       case "blume_generate_post": {
         const post = await generatePost({
           brand:      String(args.brand),

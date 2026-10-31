@@ -10,6 +10,9 @@ export const config = {
     apiKey: process.env.ANTHROPIC_API_KEY ?? "",
     model: "claude-sonnet-4-6",
   },
+  serpapi: {
+    apiKey: process.env.SERPAPI_API_KEY ?? "",
+  },
   vault: {
     root: process.env.VAULT_ROOT ?? "./vaults",
   },
