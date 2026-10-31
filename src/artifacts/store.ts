@@ -10,6 +10,13 @@ import path from "path";
 import { config } from "../config.js";
 import { computeHash, newUuid, toRouterTag, validateRouterTag } from "./routerTag.js";
 import { DEFAULT_VAULT_SLUG } from "./registry.js";
+import { isInstitutionalScope } from "./scope.js";
+
+export const RAW_SIGNAL_KIND = "tpig.raw_signal";
+
+function isRawSignal(a: { metadata?: Record<string, unknown> }): boolean {
+  return a.metadata?.kind === RAW_SIGNAL_KIND;
+}
 import { isSupabaseEnabled, dbSaveArtifact, dbReadArtifacts, type DbArtifact } from "../integrations/supabase.js";
 import type { Artifact, IngestInput, RouterTag, ArtifactSource } from "./types.js";
 
@@ -34,9 +41,14 @@ function ensureDir(dir: string): void {
 export async function persistArtifact(a: Artifact): Promise<void> {
   const dir = brandDir(a.brand);
   ensureDir(dir);
-  fs.writeFileSync(path.join(dir, `${a.uuid}.json`), JSON.stringify(a, null, 2), "utf-8");
+  // Raw signals are write-once: exclusive-create locally, insert-only in Supabase.
+  const immutable = isRawSignal(a);
+  fs.writeFileSync(path.join(dir, `${a.uuid}.json`), JSON.stringify(a, null, 2), {
+    encoding: "utf-8",
+    flag: immutable ? "wx" : "w",
+  });
   if (isSupabaseEnabled()) {
-    const saved = await dbSaveArtifact(a);
+    const saved = await dbSaveArtifact(a, { insertOnly: immutable });
     if (saved === null) {
       throw new Error(`artifact mirror failed: write to live thq_artifacts did not succeed (uuid=${a.uuid}). Local copy preserved.`);
     }
@@ -44,12 +56,21 @@ export async function persistArtifact(a: Artifact): Promise<void> {
 }
 
 /** Ingest: validate → assign uuid/timestamp/version/hash/source → store (awaits live mirror). */
-export async function ingestArtifact(input: IngestInput): Promise<{ artifact: Artifact; routerTag: RouterTag }> {
+export async function ingestArtifact(
+  input: IngestInput,
+  opts?: { institutional?: boolean },
+): Promise<{ artifact: Artifact; routerTag: RouterTag }> {
   if (!input.brand || typeof input.brand !== "string") {
     throw new Error("ingest: 'brand' (slug) is required");
   }
   if (!input.title || typeof input.title !== "string") {
     throw new Error("ingest: 'title' is required");
+  }
+  if (isInstitutionalScope(input.brand) && !opts?.institutional) {
+    throw new Error(`ingest: "${input.brand}" is a reserved institutional scope; it cannot be written through this path`);
+  }
+  if (input.metadata?.kind === RAW_SIGNAL_KIND && !opts?.institutional) {
+    throw new Error(`ingest: metadata.kind "${RAW_SIGNAL_KIND}" is reserved for the signal envelope writer`);
   }
 
   const now = new Date().toISOString();
@@ -85,7 +106,12 @@ export async function ingestArtifact(input: IngestInput): Promise<{ artifact: Ar
 export function getArtifact(uuid: string, brand?: string): Artifact | null {
   const tryPath = (b: string): Artifact | null => {
     const p = path.join(brandDir(b), `${uuid}.json`);
-    return fs.existsSync(p) ? (JSON.parse(fs.readFileSync(p, "utf-8")) as Artifact) : null;
+    if (!fs.existsSync(p)) return null;
+    const a = JSON.parse(fs.readFileSync(p, "utf-8")) as Artifact;
+    if (isRawSignal(a) && computeHash(a.body) !== a.hash) {
+      throw new Error(`integrity: raw signal ${a.uuid} body does not match its recorded hash`);
+    }
+    return a;
   };
   if (brand) return tryPath(brand);
 
@@ -164,6 +190,7 @@ export async function versionArtifact(
 ): Promise<Artifact> {
   const orig = getArtifact(uuid);
   if (!orig) throw new Error(`version: artifact not found: ${uuid}`);
+  if (isRawSignal(orig)) throw new Error("version: raw signals are immutable and cannot be versioned");
 
   const lineageRoot = orig.parent_uuid ?? orig.uuid;
   const lineage = listArtifactsLocal({ brand: orig.brand }).filter(

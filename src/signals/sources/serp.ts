@@ -3,7 +3,7 @@
 
 import axios from "axios";
 import { config } from "../../config.js";
-import { MAX_RESULTS, logSignalRetrieval, saveRawSignal } from "../envelope.js";
+import { MAX_RESULTS, logSignalEvent, recordRetrieval } from "../envelope.js";
 
 export type SerpEngine = "google" | "google_events" | "google_maps" | "youtube" | "google_news";
 
@@ -13,6 +13,29 @@ export interface SerpQuery {
   location?: string;
   num?: number;
   save?: boolean;
+}
+
+async function fetchSerp(
+  engine: string,
+  params: Record<string, unknown>,
+): Promise<{ data: Record<string, unknown>; retrievedAt: string }> {
+  const retrievedAt = new Date().toISOString();
+  try {
+    const res = await axios.get("https://serpapi.com/search.json", { params, timeout: 30_000 });
+    const data = res.data as Record<string, unknown>;
+    if (typeof data.error === "string") throw new Error(`SerpAPI: ${data.error}`);
+    return { data, retrievedAt };
+  } catch (err) {
+    const { api_key: _omit, ...safe } = params;
+    logSignalEvent({
+      event: "retrieval_failed",
+      provider: "serpapi",
+      engine,
+      params: safe,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
 }
 
 const QUERY_PARAM: Record<SerpEngine, string> = {
@@ -45,14 +68,10 @@ export async function serpSearch(query: SerpQuery): Promise<Record<string, unkno
   const num = Math.min(Math.max(query.num ?? 10, 1), MAX_RESULTS);
   if (engine === "google") params.num = num;
 
-  const retrievedAt = new Date().toISOString();
-  const res = await axios.get("https://serpapi.com/search.json", { params, timeout: 30_000 });
-  const data = res.data as Record<string, unknown>;
-  if (typeof data.error === "string") throw new Error(`SerpAPI: ${data.error}`);
-
-  const meta = { provider: "serpapi", engine, params, retrievedAt };
-  const saved = query.save ? await saveRawSignal({ ...meta, response: data }) : null;
-  logSignalRetrieval(meta, saved);
+  const { data, retrievedAt } = await fetchSerp(engine, params);
+  const rec = await recordRetrieval({
+    provider: "serpapi", engine, params, retrievedAt, response: data, save: query.save === true,
+  });
 
   const results = (data[RESULT_KEY[engine]] as unknown[] | undefined) ?? [];
   return {
@@ -63,7 +82,9 @@ export async function serpSearch(query: SerpQuery): Promise<Record<string, unkno
     related_searches: data.related_searches ?? [],
     related_questions: data.related_questions ?? [],
     search_id: (data.search_metadata as { id?: string } | undefined)?.id,
-    saved,
+    retrieval_id: rec.retrieval_id,
+    saved: rec.saved,
+    save_error: rec.save_error,
   };
 }
 
@@ -100,14 +121,10 @@ export async function trendsSearch(query: TrendsQuery): Promise<Record<string, u
   if (query.geo) params.geo = query.geo;
   if (query.date) params.date = query.date;
 
-  const retrievedAt = new Date().toISOString();
-  const res = await axios.get("https://serpapi.com/search.json", { params, timeout: 30_000 });
-  const data = res.data as Record<string, unknown>;
-  if (typeof data.error === "string") throw new Error(`SerpAPI: ${data.error}`);
-
-  const meta = { provider: "serpapi", engine: "google_trends", params, retrievedAt };
-  const saved = query.save ? await saveRawSignal({ ...meta, response: data }) : null;
-  logSignalRetrieval(meta, saved);
+  const { data, retrievedAt } = await fetchSerp("google_trends", params);
+  const rec = await recordRetrieval({
+    provider: "serpapi", engine: "google_trends", params, retrievedAt, response: data, save: query.save === true,
+  });
 
   return {
     engine: "google_trends",
@@ -117,6 +134,8 @@ export async function trendsSearch(query: TrendsQuery): Promise<Record<string, u
     date: query.date,
     result: data[TRENDS_RESULT_KEY[dataType]] ?? null,
     search_id: (data.search_metadata as { id?: string } | undefined)?.id,
-    saved,
+    retrieval_id: rec.retrieval_id,
+    saved: rec.saved,
+    save_error: rec.save_error,
   };
 }

@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import type { BrandProfile } from "./types.js";
+import { isInstitutionalScope } from "../artifacts/scope.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BRANDS_DIR = path.resolve(__dirname, "../../brands");
@@ -42,6 +43,10 @@ export function addBrand(profile: BrandProfile): void {
   const safeSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, "");
   if (safeSlug !== slug) {
     throw new Error(`Invalid slug "${slug}". Use only lowercase letters, numbers, and hyphens.`);
+  }
+
+  if (isInstitutionalScope(slug)) {
+    throw new Error(`"${slug}" is a reserved institutional scope and cannot be used as a brand slug.`);
   }
 
   fs.mkdirSync(BRANDS_DIR, { recursive: true });

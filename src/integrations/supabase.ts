@@ -112,13 +112,16 @@ export interface DbArtifact {
   metadata: Record<string, unknown>;
 }
 
-export async function dbSaveArtifact(a: DbArtifact): Promise<DbArtifact | null> {
+export async function dbSaveArtifact(
+  a: DbArtifact,
+  opts?: { insertOnly?: boolean },
+): Promise<DbArtifact | null> {
   const sb = getSupabase();
   if (!sb) return null;
 
-  const { data, error } = await sb
-    .from("thq_artifacts")
-    .upsert(a)
+  // insertOnly: immutable records must never overwrite an existing uuid.
+  const table = sb.from("thq_artifacts");
+  const { data, error } = await (opts?.insertOnly ? table.insert(a) : table.upsert(a))
     .select()
     .single();
 
