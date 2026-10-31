@@ -1,6 +1,6 @@
 # TPIG Retrieval Ledger
 
-**Status:** DRAFT for Founder review. Conditionally ratified design decisions (Correction 5, 2026-10-31); implementation NOT wired, migration NOT applied. A pre-deployment security gate (2026-10-31) found the migration as committed NOT ready to apply; a proposed remediation (R1-R5) is proven locally and awaits fold-in and review (section 18).
+**Status:** DRAFT for Founder review. Conditionally ratified design decisions (Correction 5, 2026-10-31). The migration now INTEGRATES the remediation (R1-R5) from the 2026-10-31 pre-deployment security gate and has been re-tested in its final form and mutation-tested. It is still NOT applied to any database, and no retrieval path is wired.
 **Schema version:** `tpig-ledger-1`
 **Owners:** `revenue-core-infra` owns the table, constraints, triggers, privileges and reconciliation view (migration `20261031221514_thq_retrieval_events_ledger.sql`). BLUME owns this doctrine, the event contract and, later, the writer. TerravianHQ and ASSIST are read-only consumers.
 **Governance:** operates under TPIG (provisional): "Every retrieval and transformation shall be logged"; "Maintain immutable histories of retrieval"; "minimize unnecessary retention of personal data". Preserves `tpig-query-policy-1` and `tpig-sanitize-2` (see `tpig-query-and-pii-policy.md`) and the write-once raw-signal guards.
@@ -28,8 +28,8 @@ Not in scope: storing queries or provider payloads (those are policy-governed el
 
 ## 3. Architecture
 
-- **System of record:** `public.thq_retrieval_events` in the shared `revenue-core` database. Append-only. Inserted only by the BLUME writer through the service role.
-- **Writer (future, BLUME):** builds events from a typed allowlist, passes any structured field through the Correction 6 sanitizer, inserts with `on conflict (event_id) do nothing`.
+- **System of record:** `public.thq_retrieval_events` in the shared `revenue-core` database. Append-only. The BLUME writer (service role) has `SELECT` only and writes exclusively through the `SECURITY DEFINER` function `thq_append_retrieval_event(jsonb)`; there is no direct table `INSERT` for it.
+- **Writer (future, BLUME):** builds events from a typed allowlist, passes any structured field through the Correction 6 sanitizer, computes the canonical row hash client-side, and calls `thq_append_retrieval_event`. It treats `inserted` and `duplicate` as success and everything else as failure, never retries a conflict, and never surfaces a database error's message, detail or hint to a caller or log (it maps errors to a closed code).
 - **Outbox (optional, D2):** a bounded local buffer used only when explicitly enabled and the database is unreachable. It is drained and emptied; it is never retained as a log.
 - **Reconciliation (read-only):** the `thq_retrieval_reconciliation` view reports problems and resolves nothing.
 
@@ -108,7 +108,8 @@ Adding a provider, engine, event type, reason code or field is a migration and a
 ## 6. How the schema enforces privacy
 
 - A `BEFORE INSERT` trigger validates every field and raises a **fixed message naming only the field** (for example `field "writer_id" violates the allowlist`). Database CHECK and NOT NULL violations attach the failing row to the error detail, so the trigger runs first and the CHECK constraints are an unreachable backstop. Tests confirm a marker placed in a rejected field never appears in the error message or detail.
-- Unique-key errors (`event_id`, `(retrieval_id, seq)`) mention only UUIDs.
+- Writes enter through `thq_append_retrieval_event`, which checks the **shape and type of every value before any cast** (lower-case uuid pattern, integer pattern of at most 9 digits, boolean, calendar-valid millisecond timestamp, array of strings). A database type error would otherwise echo the rejected value (`invalid input syntax for type uuid: "..."`). It refuses unknown keys **without naming them**, refuses client-supplied `recorded_at`/`txid`, and caps the payload at 8 KiB.
+- A conflicting duplicate raises a fixed message (`event_id conflict` or `(retrieval_id, seq) conflict`); no row values appear in it.
 - The reconciliation view exposes counts, ids and timestamps only.
 - Writers must never put a provider message, URL or query text into any field; there is nowhere to put it.
 
@@ -124,7 +125,7 @@ The database verifies the hash on insert and the reconciliation view re-checks s
 
 **Default (strict):**
 
-1. Mint `retrieval_id`. Insert `provider_attempt` and wait for the database acknowledgement (bounded timeout and retries).
+1. Mint `retrieval_id`. Call `thq_append_retrieval_event` with `provider_attempt` and wait for `inserted` (or `duplicate`, on a retry) within a bounded timeout and retries.
 2. If it is not acknowledged, **do not call the provider.** The caller receives a generic ledger-unavailable error with no detail.
 3. After the provider returns, insert the outcome and archive events as one batch with bounded retries.
 4. If outcome events cannot be recorded in strict mode, the retrieval is left as an attempt with no outcome. Reconciliation reports it (`incomplete_retrieval`, or `archive_outcome_missing`). **Decided (O1):** sanitized results may still be returned, flagged `ledger_degraded`, but **only after a durably acknowledged `provider_attempt`**. If the attempt was not acknowledged, no provider call is made and nothing is returned.
@@ -137,7 +138,7 @@ The database verifies the hash on insert and the reconciliation view re-checks s
 - The outbox holds only the same allowlisted event payloads, never query text. Events are removed from it only after the database acknowledges them. It is not a debug mirror and is not retained after delivery.
 - Less durable, and said so: a single machine's disk. Events still in the outbox when that machine is lost are lost. In outbox mode the attempt can precede database acknowledgement.
 
-**Idempotency and retry:** `event_id` is generated once per event and reused on every retry. Inserts use `on conflict (event_id) do nothing`, so a lost acknowledgement followed by a retry is harmless. `(retrieval_id, seq)` is unique, so two different events cannot claim the same slot.
+**Idempotency and retry:** `event_id` is generated once per event and reused on every retry. The append function compares the canonical `row_hash` when the `event_id` already exists: an **identical** retry returns `duplicate` (no error, no second row); a **conflicting** payload under the same `event_id` raises, so it is never a silent no-op. `(retrieval_id, seq)` is unique, so two different events cannot claim the same slot, and that conflict also raises a fixed message.
 
 ## 9. Failure recovery matrix
 
@@ -163,7 +164,8 @@ The database verifies the hash on insert and the reconciliation view re-checks s
 | `archive_outcome_missing` | Provider success, archival requested, no archive/sanitization/withholding event after the grace window |
 | `outcome_without_attempt` | Outcome events with no attempt (legacy-import rows are excluded) |
 | `sequence_gap` | `max(seq)` differs from the number of events |
-| `orphan_artifact_reference` | `archive_succeeded` points at an artifact that no longer exists and no `retention_exception` explains it |
+| `orphan_artifact_reference` | `archive_succeeded` points at an artifact that no longer exists and no `scope = artifact` `retention_exception` explains it (a `ledger_rows` exception never excuses one) |
+| `conflicting_outcomes` | More than one provider outcome, or more than one archive outcome, on one retrieval |
 | `artifact_hash_mismatch` | Recorded hash differs from the artifact's hash |
 | `artifact_without_ledger` | A raw-signal artifact newer than the ledger's first event has no `archive_succeeded` |
 | `pre_ledger_artifact` | Informational: a raw signal older than the ledger (for example c0dc83b0) |
@@ -173,8 +175,9 @@ Reconciliation never repairs data. Resolution is a human decision recorded elsew
 
 ## 11. Access control
 
-- Row level security enabled, no policies. `anon`, `authenticated` and `PUBLIC` have no privileges on the table, the view or the helper functions.
-- `service_role`: `SELECT` and `INSERT` only. `UPDATE`, `DELETE`, `TRUNCATE`, `REFERENCES` and `TRIGGER` are revoked.
+- Row level security enabled, no policies. `anon`, `authenticated` and `PUBLIC` have no privileges on the table, the view or any helper function.
+- `service_role`: `SELECT` on the table and the view; `EXECUTE` on exactly two functions, `thq_append_retrieval_event` (the write path) and `thq_retrieval_event_row_hash` (reconciliation tooling re-checks stored rows). **No** `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`, `REFERENCES` or `TRIGGER`, and no `EXECUTE` on any internal helper. Production's default privileges grant `EXECUTE` on every new function to `service_role`, so the migration revokes it explicitly and grants back only these two.
+- The single `SECURITY DEFINER` function runs with `search_path = pg_catalog, pg_temp` (no `public`); every object reference inside it is schema-qualified. It can only `INSERT`, and it refuses `retention_exception`.
 - Any future consumer gets a narrower approved view, never the base table.
 - The retention GUC `thq.ledger_retention_reason` is separate from the raw-signal guard's GUC, so one authorization cannot open the other.
 
@@ -184,13 +187,18 @@ Reconciliation never repairs data. Resolution is a human decision recorded elsew
 
 **Append-only guarantees:** `UPDATE` is never permitted. `TRUNCATE` is never permitted. `DELETE` is permitted only under a retention exception. These guard against accidents and ordinary application paths; a database administrator can drop the triggers, and a drop is an incident visible in migration history.
 
-**Retention exception (how deletion coexists with append-only):** ledger rows can be removed only by a version-controlled, Founder-approved migration that, in **one transaction**:
+**Retention exception (how deletion coexists with append-only):** only the **owner / migration role** can record or use one. A version-controlled, Founder-approved migration, in **one transaction**:
 
-1. sets `thq.ledger_retention_reason` with `set_config(..., true)` (transaction-local; never session or role level);
-2. inserts exactly one `retention_exception` event naming the evidence file, the scope, the affected row count and, for artifact removals, the `artifact_uuid`;
+1. sets `thq.ledger_retention_reason` with `set_config(..., true)` (transaction-local; never session or role level), with text that **names the evidence file**;
+2. inserts exactly one `retention_exception` event **directly** (the append function refuses this type), with `retention_ref` equal to that file, the scope, the affected row count, and `artifact_uuid` only for scope `artifact`;
 3. deletes the narrowly named rows and asserts the deleted count equals `affected_rows`.
 
-The delete trigger allows a row only when the reason is set **and** a `retention_exception` row from the same transaction exists. An exception from an earlier transaction authorizes nothing. `retention_exception` rows can never be deleted, so the record of exceptions is itself permanent.
+Enforced by the database, not by convention:
+
+- **R1:** a `retention_exception` is accepted only from a role that holds `DELETE` on the ledger (the writer role does not), only while the reason is set, and only if the reason names the row's `retention_ref`. `artifact_uuid` is required for scope `artifact` and forbidden for scope `ledger_rows`.
+- **R2:** a `DELETE` is allowed only when the reason is set **and** a `retention_exception` row from the **same transaction** exists whose `retention_ref` the reason names. An exception from an earlier transaction authorizes nothing, and a stale reason about another file authorizes nothing.
+- **R3:** a `DELETE` statement may not remove more rows than the same-transaction `ledger_rows` exceptions declare in `affected_rows`; an `artifact`-scope exception authorizes no ledger-row deletion.
+- `retention_exception` rows can never be deleted, `UPDATE` and `TRUNCATE` are never permitted, and ledger rows are removed **by whole retrieval only** (a partial removal is reported as `sequence_gap`).
 
 **Artifacts:** a future approved artifact removal records a `retention_exception` with `scope = artifact` and the `artifact_uuid`, so reconciliation does not report the ledger's `archive_succeeded` row as an orphan.
 
@@ -216,23 +224,17 @@ Findings that need a decision before any import:
 
 ## 14. Test matrix
 
-**Implemented now: isolated local PostgreSQL** (`revenue-core-infra/scripts/local-test/run.sh`; throwaway cluster on 127.0.0.1, simulated Supabase roles, never connects to Supabase):
+All of it runs against the **final integrated migration** (no overlay) in an isolated local PostgreSQL (`revenue-core-infra/scripts/local-test/`; throwaway cluster on loopback, simulated Supabase roles, never connects to Supabase).
 
-| Area | Cases |
-|---|---|
-| Privileges and RLS | anon / authenticated / PUBLIC have nothing on table, view or helper functions; `service_role` has SELECT and INSERT only; RLS enabled with no policies; view is `security_invoker`; exactly the expected triggers exist |
-| Valid events | one of each event type accepted from the service role; optional fields may be omitted |
-| Strict allowlists | 48 invalid events (unknown type/provider/engine/reason/error/stage/field values, phase mismatch, unsorted or duplicate arrays, forbidden and missing fields per type, the legacy-import exemption not extending beyond `provider_succeeded`, bad formats, out-of-range numbers, time bounds, null core fields), each rejected with the fixed message and **no marker leaked into message or detail** |
-| Uniqueness and idempotency | duplicate `event_id` rejected; duplicate `(retrieval_id, seq)` rejected; `ON CONFLICT DO NOTHING` retry inserts nothing; next `seq` accepted |
-| Row hash | known-answer vector equals an independent JavaScript implementation; a wrong or malformed hash is rejected |
-| Server-owned columns | client `recorded_at` and `txid` are ignored |
-| Append-only | UPDATE, DELETE and TRUNCATE blocked for the owner; denied for `service_role` |
-| Retention exception | reason alone, exception alone and a session-level reason all fail; UPDATE and TRUNCATE stay blocked under an exception; the narrow delete works in one transaction; an earlier transaction's exception does not authorize a later delete; `retention_exception` rows cannot be deleted |
-| Reconciliation | each issue is detected; healthy, not-requested-save, rejection-only, legacy-import and retention-covered cases are not flagged; non raw-signal artifacts are never listed; the service role can read the view |
+| Suite | Checks | Result |
+|---|---|---|
+| Main regression (`run.sh`) | 218 (the original 163 preserved, plus append-function contract, retention coupling, delete cap, reconciliation scoping) | all pass |
+| Adversarial security gate (`ADVERSARIAL=1`) | 52 SQL (the original 47, plus 2 definer checks and 3 layer tests) and 5 bash-level (concurrent writers, atomic apply, re-apply, genuine non-superuser escalation) | all pass |
+| Mutation testing (`mutation/run-mutations.sh`) | 37 mutants, each removing or weakening one protection | 36 detected, 1 survived (1 expected-redundant), 0 failed to apply |
 
-The suite was also **mutation-tested**: the migration was deliberately broken in 12 ways (for example leaving default grants, dropping the validate trigger, allowing UPDATE, letting a reason alone permit DELETE, reordering the hash fields, disabling RLS) and the suite failed each time (three of the breakages abort the script outright instead of reporting a failed check, which also fails the run). The suite currently runs 163 checks, all passing.
+The mutation set covers the pre-existing protections (grants, RLS, validation, append-only triggers, hash order, uniqueness, legacy exemption) and every new one (R1 guard trigger and each of its checks, R2 evidence-file binding, R3 delete cap, R4 append function: duplicate-conflict comparison, pre-cast validation, unknown keys, size cap, `search_path`, `SECURITY DEFINER`, EXECUTE grants, calendar validity, seq-conflict message, R5 orphan scope and conflicting outcomes). `R4b` removes the append function's refusal of `retention_exception`; it survives alone because the R1 guard trigger also refuses it (defense in depth), and `R4b2` (both layers removed) is detected.
 
-**Specified for the later writer (not built; needs separate approval):** idempotent re-insert; strict mode makes no provider call when the attempt is not acknowledged; outbox bounds, ordered drain and removal only after acknowledgement; torn-line quarantine; crash between attempt and outcome; allowlist builder refuses unknown fields; no query text or hash in rejection events; no free-text errors; one `retrieval_id` and monotonic `seq` per retrieval; archive link matches artifact uuid and hash; sanitization-unverified writes no content; preserved Correction 6 and raw-signal guard behaviour (existing suite stays green).
+**Specified for the later writer (not built; needs separate approval):** strict mode makes no provider call when the attempt is not acknowledged; `ledger_degraded` only after an acknowledged attempt (O1); allowlist builder refuses unknown fields; no query text or hash in rejection events; no free-text errors; database errors never surfaced; one `retrieval_id` and monotonic `seq` per retrieval; archive link matches artifact uuid and hash; sanitization-unverified writes no content; Correction 6 and raw-signal guard behaviour preserved (existing suite stays green). The outbox is disabled for the initial release (O4) and has no tests until separately approved.
 
 ## 15. Cost and operations (D9 findings)
 
@@ -242,11 +244,11 @@ The suite was also **mutation-tested**: the migration was deliberately broken in
 
 ## 16. Implementation plan (gated; nothing below is authorized yet)
 
-1. Founder review of this document, the migration and the local test results.
-2. Founder authorization to apply the migration; apply with the same gated, scripted flow used for migration `20261031192720`, then verify and record evidence.
-3. Writer module in BLUME with mocked-database tests (the specified writer tests above).
-4. Wire the retrieval path: `provider_attempt` before transmission, then outcome/archive events. Strict mode only unless the outbox is separately enabled.
-5. Optional outbox implementation, off by default, with its bounds and status command.
+1. **Done:** security-gate remediation R1-R5 integrated into the migration; final-form regression, adversarial and mutation testing recorded (`revenue-core-infra/audit/predeploy/`).
+2. Founder review of this document, the integrated migration and the evidence.
+3. Founder authorization to apply the migration **as an empty table**, using the same gated, scripted flow as migration `20261031192720` (prerequisites in section 18).
+4. Writer module in BLUME with mocked-database tests, built to the writer rules in section 3.
+5. Wire the retrieval path: `provider_attempt` before transmission, then outcome/archive events. Strict mode only (outbox disabled, O4).
 6. Reconciliation script and a status command.
 7. Legacy import: dry run again, then a real run only on separate written authorization.
 
@@ -260,29 +262,21 @@ The suite was also **mutation-tested**: the migration was deliberately broken in
 | O4 | Outbox | **Decided:** disabled for the initial release. |
 | O5 | Retention schedule | **Unresolved. Tracked as a launch blocker for full operational launch** (not for applying an empty table). Until ratified, ledger retention is indefinite. |
 
-## 18. Pre-deployment security gate (2026-10-31)
+## 18. Pre-deployment security gate and remediation integration (2026-10-31)
 
-Full report: `revenue-core-infra/audit/predeploy/20261031-ledger-security-gate.md`.
+Gate report: `revenue-core-infra/audit/predeploy/20261031-ledger-security-gate.md`. Integration evidence: `revenue-core-infra/audit/predeploy/20261031-ledger-remediation-integration.md`.
 
-Against the migration as committed: 35 adversarial SQL checks pass and **12 fail** (9 distinct findings, 2 High), 5 bash-level checks pass, the 163-check main suite passes. Against the proposed overlay (`revenue-core-infra/scripts/local-test/proposed/remediation-001.sql`): 47 pass, 0 findings, bash-level checks pass, the main suite still passes.
+**Gate outcome (before remediation):** the migration as first committed failed 4 of 8 areas (9 distinct findings, 2 High): forgeable permanent `retention_exception` rows, silent drop of conflicting duplicate events, retention-exception replay and over-delete, rejected values echoed by type errors, and reconciliation gaps.
 
-| Area | Result | Findings |
-|---|---|---|
-| Duplicate `event_id`, conflicting payload or hash | FAIL | A1: `ON CONFLICT DO NOTHING` silently drops a conflicting event |
-| Duplicate `(retrieval_id, seq)` | PASS | |
-| Retention exception spoofing, replay, escalation | FAIL | C1 (writer can forge a permanent exception row), C3, C4 (stale reason replay), C5 (one exception authorizes more rows than declared) |
-| SECURITY DEFINER, search_path, RLS, grants | PASS | |
-| SQL errors exposing rejected values | FAIL | E1: type errors echo the rejected value |
-| Reconciliation | FAIL | F1, F2 (forged exception hides an orphan), F3 (conflicting outcomes unreported) |
-| Production compatibility | PASS | PG 17.6; revokes are required and tested |
-| Backup and restore readiness | NOT READY for launch | see O3 |
+**Integrated (R1-R5), final form:** every finding is closed and the dedicated table, strict allowlists, RLS, append-only protections and reconciliation view are preserved. Results: main suite 218/218, adversarial 52 SQL + 5 bash, mutation 36 of 37 detected (the 1 survivor is the documented redundant layer).
 
-**Design consequences recorded here (the writer is not built, so these bind it):**
+**Exact deployment prerequisites (applying the EMPTY table):**
 
-- Writes go through one function, `thq_append_retrieval_event(jsonb)` (proposed R4), not a direct table INSERT. The writer treats `inserted` and `duplicate` as success and everything else as failure, and never retries a conflict.
-- The writer must never surface a database error's message, detail or hint to a caller or log; it maps errors to a closed error code.
-- Only the owner path (an approved migration) records a `retention_exception`; the writer role cannot (proposed R1), and the exception's reason must name its evidence file (R1, R2) and its row count caps the deletion (R3).
-- Ledger-row retention removes whole retrievals only; partial removal is reported as `sequence_gap`.
-- Reconciliation gains `conflicting_outcomes` (R5), and an orphan is excused only by a `scope = 'artifact'` exception.
+1. Founder review and **separate written authorization** to apply.
+2. Apply only through the gated, scripted flow: a scratch workdir linked to revenue-core (ref ending `jqek`), the repo clean at the reviewed commit, the migration directories byte-identical, a dry run that lists **exactly** `20261031221514_thq_retrieval_events_ledger.sql`, and a remote history that is exactly the expected pre-apply state (latest `20261031192720`, 76 entries). Post-apply expectation: latest `20261031221514`, 77 entries.
+3. Re-verify read-only immediately before applying: Postgres version, no name collisions, default privileges unchanged, `thq_artifacts` columns unchanged.
+4. After applying, verify read-only against production: RLS on, `service_role` holds `SELECT` only on the table and the view, exactly 5 triggers and 8 functions, exactly one `SECURITY DEFINER` function pinned to `pg_catalog, pg_temp`, `EXECUTE` limited to the owner plus `service_role` on two functions, zero rows, and the reconciliation view readable (expect one `pre_ledger_artifact` row, c0dc83b0). Record an evidence file.
+5. The assumption that the Supabase CLI applies a migration file in one transaction is checked by the post-apply verification (a partial apply would show missing objects).
+6. Rollback is `DROP` of the objects listed in the migration header, valid only while the table is empty.
 
-**Recommendation:** fold R1-R5 into the (still unapplied) migration, re-run the full local suite expecting zero findings, review, then consider applying the empty table under the gated flow. Operational launch additionally needs O3, O5, the writer, and the writer's tests.
+**Not prerequisites for applying an empty table, but blockers for operational launch:** the writer built to the rules above with its own tests; O3 (a restorable backup or a compensating checkpoint; PITR is off and no restorable backup is listed); O5 (a ratified retention schedule).
