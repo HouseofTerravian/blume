@@ -1,6 +1,6 @@
 # TPIG Retrieval Ledger
 
-**Status:** DRAFT for Founder review. Conditionally ratified design decisions (Correction 5, 2026-10-31); implementation NOT wired, migration NOT applied.
+**Status:** DRAFT for Founder review. Conditionally ratified design decisions (Correction 5, 2026-10-31); implementation NOT wired, migration NOT applied. A pre-deployment security gate (2026-10-31) found the migration as committed NOT ready to apply; a proposed remediation (R1-R5) is proven locally and awaits fold-in and review (section 18).
 **Schema version:** `tpig-ledger-1`
 **Owners:** `revenue-core-infra` owns the table, constraints, triggers, privileges and reconciliation view (migration `20261031221514_thq_retrieval_events_ledger.sql`). BLUME owns this doctrine, the event contract and, later, the writer. TerravianHQ and ASSIST are read-only consumers.
 **Governance:** operates under TPIG (provisional): "Every retrieval and transformation shall be logged"; "Maintain immutable histories of retrieval"; "minimize unnecessary retention of personal data". Preserves `tpig-query-policy-1` and `tpig-sanitize-2` (see `tpig-query-and-pii-policy.md`) and the write-once raw-signal guards.
@@ -127,9 +127,9 @@ The database verifies the hash on insert and the reconciliation view re-checks s
 1. Mint `retrieval_id`. Insert `provider_attempt` and wait for the database acknowledgement (bounded timeout and retries).
 2. If it is not acknowledged, **do not call the provider.** The caller receives a generic ledger-unavailable error with no detail.
 3. After the provider returns, insert the outcome and archive events as one batch with bounded retries.
-4. If outcome events cannot be recorded in strict mode, the retrieval is left as an attempt with no outcome. Reconciliation reports it (`incomplete_retrieval`, or `archive_outcome_missing`). The caller is told the ledger is degraded. See open item O1.
+4. If outcome events cannot be recorded in strict mode, the retrieval is left as an attempt with no outcome. Reconciliation reports it (`incomplete_retrieval`, or `archive_outcome_missing`). **Decided (O1):** sanitized results may still be returned, flagged `ledger_degraded`, but **only after a durably acknowledged `provider_attempt`**. If the attempt was not acknowledged, no provider call is made and nothing is returned.
 
-**Optional outbox fallback (explicit opt-in; less durable):**
+**Optional outbox fallback (explicit opt-in; less durable). Decided (O4): disabled for the initial release; not built or enabled until separately approved.**
 
 - Off by default. Enabled only by an explicit setting.
 - Bounded: at most a fixed number of events and a fixed maximum age (proposed 200 events and 24 hours; to be ratified). When either bound would be exceeded, the writer fails closed and no new attempt is made.
@@ -250,10 +250,39 @@ The suite was also **mutation-tested**: the migration was deliberately broken in
 6. Reconciliation script and a status command.
 7. Legacy import: dry run again, then a real run only on separate written authorization.
 
-## 17. Open items needing Founder decisions
+## 17. Founder policy decisions and open items (updated 2026-10-31, security gate)
 
-- **O1.** In strict mode, if outcome events cannot be recorded after the provider call, return the results with a degraded flag (proposed; the data is already paid for and withholding does not improve the record) or withhold them?
-- **O2.** Ratify the `result_count` relaxation for `legacy-import` rows (section 13).
-- **O3.** Verify the Supabase plan and available backups (D9), then decide whether periodic checkpoints are wanted.
-- **O4.** Ratify the outbox bounds (proposed 200 events, 24 hours) if the outbox is ever enabled.
-- **O5.** Retention schedule (D5): ledger retention is indefinite until one is ratified.
+| | Item | Status |
+|---|---|---|
+| O1 | Outcome-write failure in strict mode | **Decided:** sanitized results may return with `ledger_degraded` only after a durably acknowledged `provider_attempt`. |
+| O2 | `result_count` exemption for `legacy-import` rows | **Approved as specified** (section 13). Tested: it extends no further than `provider_succeeded`. |
+| O3 | Backup and plan verification | **Open.** Verified read-only: PITR off, no restorable backup listed, WAL archiving running; plan tier not exposed and not assumed. Must be resolved (or compensated, for example by periodic checkpoints) before the ledger is described as durable audit evidence. |
+| O4 | Outbox | **Decided:** disabled for the initial release. |
+| O5 | Retention schedule | **Unresolved. Tracked as a launch blocker for full operational launch** (not for applying an empty table). Until ratified, ledger retention is indefinite. |
+
+## 18. Pre-deployment security gate (2026-10-31)
+
+Full report: `revenue-core-infra/audit/predeploy/20261031-ledger-security-gate.md`.
+
+Against the migration as committed: 35 adversarial SQL checks pass and **12 fail** (9 distinct findings, 2 High), 5 bash-level checks pass, the 163-check main suite passes. Against the proposed overlay (`revenue-core-infra/scripts/local-test/proposed/remediation-001.sql`): 47 pass, 0 findings, bash-level checks pass, the main suite still passes.
+
+| Area | Result | Findings |
+|---|---|---|
+| Duplicate `event_id`, conflicting payload or hash | FAIL | A1: `ON CONFLICT DO NOTHING` silently drops a conflicting event |
+| Duplicate `(retrieval_id, seq)` | PASS | |
+| Retention exception spoofing, replay, escalation | FAIL | C1 (writer can forge a permanent exception row), C3, C4 (stale reason replay), C5 (one exception authorizes more rows than declared) |
+| SECURITY DEFINER, search_path, RLS, grants | PASS | |
+| SQL errors exposing rejected values | FAIL | E1: type errors echo the rejected value |
+| Reconciliation | FAIL | F1, F2 (forged exception hides an orphan), F3 (conflicting outcomes unreported) |
+| Production compatibility | PASS | PG 17.6; revokes are required and tested |
+| Backup and restore readiness | NOT READY for launch | see O3 |
+
+**Design consequences recorded here (the writer is not built, so these bind it):**
+
+- Writes go through one function, `thq_append_retrieval_event(jsonb)` (proposed R4), not a direct table INSERT. The writer treats `inserted` and `duplicate` as success and everything else as failure, and never retries a conflict.
+- The writer must never surface a database error's message, detail or hint to a caller or log; it maps errors to a closed error code.
+- Only the owner path (an approved migration) records a `retention_exception`; the writer role cannot (proposed R1), and the exception's reason must name its evidence file (R1, R2) and its row count caps the deletion (R3).
+- Ledger-row retention removes whole retrievals only; partial removal is reported as `sequence_gap`.
+- Reconciliation gains `conflicting_outcomes` (R5), and an orphan is excused only by a `scope = 'artifact'` exception.
+
+**Recommendation:** fold R1-R5 into the (still unapplied) migration, re-run the full local suite expecting zero findings, review, then consider applying the empty table under the gated flow. Operational launch additionally needs O3, O5, the writer, and the writer's tests.
