@@ -247,7 +247,7 @@ The mutation set covers the pre-existing protections (grants, RLS, validation, a
 1. **Done:** security-gate remediation R1-R5 integrated into the migration; final-form regression, adversarial and mutation testing recorded (`revenue-core-infra/audit/predeploy/`).
 2. Founder review of this document, the integrated migration and the evidence.
 3. Founder authorization to apply the migration **as an empty table**, using the same gated, scripted flow as migration `20261031192720` (prerequisites in section 18).
-4. Writer module in BLUME with mocked-database tests, built to the writer rules in section 3.
+4. Writer module in BLUME with mocked-database tests, built to the writer rules in section 3. The writer design (architecture, event-state diagram, file-change plan, test matrix, Founder decisions W1-W12) is `tpig-retrieval-ledger-writer-design.md`; it is design only until approved.
 5. Wire the retrieval path: `provider_attempt` before transmission, then outcome/archive events. Strict mode only (outbox disabled, O4).
 6. Reconciliation script and a status command.
 7. Legacy import: dry run again, then a real run only on separate written authorization.
