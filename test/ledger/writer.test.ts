@@ -95,7 +95,13 @@ describe("the provider attempt is ack-required", () => {
     db.script = [{ kind: "hang" }, { kind: "hang" }, { kind: "hang" }];
     const run = newRun(db, { config: makeConfig({ attempt: { timeoutMs: 30, retries: 2, backoffMs: [1, 1] } }) });
     const started = Date.now();
-    await assert.rejects(run.attempt(ATTEMPT), refusal("ledger_unavailable"));
+    // Bounded wait: without the writer's deadline this fails by assertion after 4 s instead of hanging until the runner's timeout.
+    const outcome = await Promise.race([
+      run.attempt(ATTEMPT).then(() => "resolved", (e: unknown) => e),
+      new Promise<string>(resolve => setTimeout(() => resolve("HUNG"), 4000)),
+    ]);
+    assert.notEqual(outcome, "HUNG", "a hung client must not hang the retrieval: the writer's own deadline must fire");
+    assert.ok(outcome instanceof LedgerUnavailable && outcome.code === "ledger_unavailable", "refused with the closed code");
     assert.ok(Date.now() - started < 3000, "returned within the bounded deadlines");
     assert.equal(db.sent.length, 3);
   });

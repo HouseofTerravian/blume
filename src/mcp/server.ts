@@ -42,6 +42,7 @@ import { computeReadiness, getLotusConfig, detectBottleneck, detectMissingEviden
 import { recommend } from "../recommend/engine.js";
 
 import { serpSearch, trendsSearch } from "../signals/sources/serp.js";
+import { ledgerStartupNotice } from "../signals/ledger/index.js";
 import { redactArtifactForRead, redactText } from "../signals/policy.js";
 
 // ─── Tool definitions ─────────────────────────────────────────────────────────
@@ -711,6 +712,7 @@ async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error(`[${config.server.name}] v${config.server.version} online. Generation + listings ready.`);
+  console.error(`[${config.server.name}] ${ledgerStartupNotice()}`);
 }
 
 main().catch(console.error);

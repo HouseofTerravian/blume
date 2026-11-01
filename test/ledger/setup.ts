@@ -3,6 +3,7 @@
 //   - no Supabase credentials and no network: ledger traffic goes to in-memory fakes
 //   - a fake provider key (never the real one)
 //   - the ledger mode starts unset (off); tests opt into strict explicitly
+import "../hermetic.js";
 import fs from "fs";
 import os from "os";
 import path from "path";

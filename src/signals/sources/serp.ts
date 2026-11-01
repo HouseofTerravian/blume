@@ -71,10 +71,12 @@ function screened<T>(provider: string, engine: string, fn: () => T): T {
 }
 
 async function fetchSerp(
+  run: RetrievalRun,
   engine: string,
   params: Record<string, unknown>,
   suppliedValues: string[],
 ): Promise<{ data: Record<string, unknown>; retrievedAt: string }> {
+  run.assertProviderAllowed();   // strict mode: no network unless this run's attempt was acknowledged
   const retrievedAt = new Date().toISOString();
   const fail = (parts: { status?: number; code?: string; providerMessage?: unknown }): never => {
     const safe = safeProviderError("SerpAPI", parts, suppliedValues);
@@ -192,7 +194,7 @@ export async function serpSearch(query: SerpQuery): Promise<Record<string, unkno
 
   let fetched: { data: Record<string, unknown>; retrievedAt: string };
   try {
-    fetched = await fetchSerp(eng, params, [q, location ?? ""]);
+    fetched = await fetchSerp(run, eng, params, [q, location ?? ""]);
   } catch (err) {
     await run.providerFailed({ engine: eng, errorCode: err instanceof ProviderError ? err.ledgerCode : "provider_error" });
     throw err;
@@ -286,7 +288,7 @@ export async function trendsSearch(query: TrendsQuery): Promise<Record<string, u
 
   let fetched: { data: Record<string, unknown>; retrievedAt: string };
   try {
-    fetched = await fetchSerp("google_trends", params, [q]);
+    fetched = await fetchSerp(run, "google_trends", params, [q]);
   } catch (err) {
     await run.providerFailed({ engine: "google_trends", errorCode: err instanceof ProviderError ? err.ledgerCode : "provider_error" });
     throw err;

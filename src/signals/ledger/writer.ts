@@ -188,6 +188,17 @@ export class RetrievalRun {
     });
   }
 
+  /**
+   * Structural guard for the provider boundary. The provider fetch calls this FIRST, so a future caller that forgets to
+   * await attempt() (or ignores its refusal) still cannot reach the network: in strict mode it throws unless the attempt
+   * of THIS run was acknowledged. Off mode is a no-op.
+   */
+  assertProviderAllowed(): void {
+    if (!this.active) return;
+    if (!this.deps.config.valid) throw new LedgerUnavailable("ledger_config_invalid");
+    if (this.attemptState !== "acked") throw new LedgerUnavailable("ledger_unavailable");
+  }
+
   // ─── best-effort events ──────────────────────────────────────────────────────────────────────────────────────
 
   private outcome(type: EventType, make: () => Readonly<LedgerEvent>): Promise<void> {

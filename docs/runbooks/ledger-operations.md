@@ -26,6 +26,10 @@
 
 A missing or invalid value refuses retrievals with a closed code; it never degrades to off. Never put key values in tickets, chat or logs.
 
+### Startup line
+
+The MCP server prints one line to stderr at startup, for example `retrieval ledger: mode=strict valid writer=blume-prod`. `mode=off` means no ledger events are written (also what a missing `.env` or wrong working directory produces). `mode=strict INVALID reason=...` means every retrieval is refused. `WARNING NODE_ENV=test` means test seams are on and Supabase is disabled: never run production that way. Set the mode in the launcher's own environment and always check this line after a restart.
+
 ## 3. What callers see
 
 - Attempt not acknowledged: error code `ledger_unavailable` (transient), `ledger_refused_hard` (conflict, validation, permission, auth, missing function) or `ledger_config_invalid`. Fixed messages; no detail. No provider request was made.

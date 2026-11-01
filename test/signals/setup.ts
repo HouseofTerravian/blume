@@ -2,6 +2,7 @@
 // - temp vault root (never the real ./vaults)
 // - Supabase forced off (no live writes)
 // - fake provider key (never the real one)
+import "../hermetic.js";
 import fs from "fs";
 import os from "os";
 import path from "path";

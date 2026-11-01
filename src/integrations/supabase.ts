@@ -10,6 +10,9 @@ let _client: SupabaseClient | null = null;
 
 export function getSupabase(): SupabaseClient | null {
   if (_client) return _client;
+  // Hermetic tests: under NODE_ENV=test a client exists only if a test injected one. Production credentials that leak
+  // into a test environment (a stray .env, an exported variable) are never used to build a real client.
+  if (process.env.NODE_ENV === "test") return null;
 
   const url = process.env.SUPABASE_URL ?? "";
   // Server-side only: the thq_* tables are RLS-locked, so only the server (sb_secret_) key works.
