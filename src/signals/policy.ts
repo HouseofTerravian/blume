@@ -9,6 +9,7 @@
 
 import { config } from "../config.js";
 import { RAW_SIGNAL_KIND } from "../artifacts/store.js";
+import type { ProviderErrorCode } from "./ledger/types.js";
 
 export const QUERY_POLICY_VERSION = "tpig-query-policy-1";
 export const SANITIZATION_POLICY = "tpig-sanitize-2";
@@ -318,10 +319,20 @@ export function sanitizeString(text: string, stage: string): string {
 // ─── Provider errors ─────────────────────────────────────────────────────────
 
 export class ProviderError extends Error {
-  constructor(message: string) {
+  /** Closed code for the retrieval ledger: http_NNN, timeout, network or provider_error. Never free text. */
+  constructor(message: string, public readonly ledgerCode: ProviderErrorCode = "provider_error") {
     super(message);
     this.name = "ProviderError";
   }
+}
+
+function providerLedgerCode(parts: { status?: number; code?: string }): ProviderErrorCode {
+  const s = parts.status;
+  if (typeof s === "number" && Number.isInteger(s) && s >= 100 && s <= 599) return `http_${s}`;
+  const c = parts.code;
+  if (c === "ECONNABORTED" || c === "ETIMEDOUT" || c === "ESOCKETTIMEDOUT") return "timeout";
+  if (typeof c === "string" && c !== "") return "network";
+  return "provider_error";
 }
 
 /**
@@ -341,10 +352,10 @@ export function safeProviderError(
     const echoes = suppliedValues.some(v => v.length >= 3 && lower.includes(v.toLowerCase()));
     const r = redactText(msg);
     if (!echoes && r.count === 0 && isClean(msg) && detectIdentifiers(msg, "query").length === 0) {
-      return new ProviderError(`${head}: ${msg}`);
+      return new ProviderError(`${head}: ${msg}`, providerLedgerCode(parts));
     }
   }
-  return new ProviderError(head);
+  return new ProviderError(head, providerLedgerCode(parts));
 }
 
 // ─── Read-time redaction (non-mutating) ──────────────────────────────────────

@@ -11,7 +11,9 @@
     "dev": "tsx src/index.ts",
     "cli": "tsx src/cli.ts",
     "mcp": "tsx src/mcp/server.ts",
-    "test": "tsx --test --test-timeout=60000 test/signals/*.test.ts"
+    "test": "tsx --test --test-timeout=60000 test/signals/*.test.ts test/ledger/*.test.ts",
+    "test:ledger-contract": "tsx --test --test-timeout=300000 test/ledger/contract/*.test.ts",
+    "ledger:reconcile": "tsx scripts/ledger-reconcile.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

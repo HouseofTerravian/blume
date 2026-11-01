@@ -7,3 +7,6 @@ exports/
 
 # Supabase CLI link scaffold (canonical migration lives in migrations/)
 supabase/
+
+# Mutation-test scratch copies
+.mutation-work/

@@ -26,6 +26,12 @@ export function isSupabaseEnabled(): boolean {
   return getSupabase() !== null;
 }
 
+/** Test seam only: inject a fake client so tests never touch the network. Production code never calls this. */
+export function __setSupabaseForTests(client: SupabaseClient | null): void {
+  if (process.env.NODE_ENV !== "test") throw new Error("supabase test seam is only available when NODE_ENV=test");
+  _client = client;
+}
+
 // ─── Vault ───────────────────────────────────────────────────────────────────
 
 export interface DbVaultEntry {

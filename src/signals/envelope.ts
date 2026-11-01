@@ -10,7 +10,9 @@ import fs from "fs";
 import path from "path";
 import { createHash, randomUUID } from "crypto";
 import { config } from "../config.js";
-import { ingestArtifact, RAW_SIGNAL_KIND } from "../artifacts/store.js";
+import { ArtifactMirrorError, ArtifactWriteError, ingestArtifact, RAW_SIGNAL_KIND } from "../artifacts/store.js";
+import { getLedgerConfig } from "./ledger/config.js";
+import { STAGES, type ArchiveErrorCode, type Stage } from "./ledger/types.js";
 import {
   SANITIZATION_POLICY,
   SanitizationFailure,
@@ -31,6 +33,8 @@ export interface RawSignalInput {
   params: Record<string, unknown>;
   response: unknown;
   retrievedAt: string;
+  /** Links a stored raw signal back to its retrieval so a discrepancy with the ledger can always be traced. */
+  retrievalId?: string;
 }
 
 function withoutKey(params: Record<string, unknown>): Record<string, unknown> {
@@ -53,6 +57,9 @@ function providerObservedAt(response: unknown): string | null {
  * replaced by a content-free suppression marker; unverified text is never written.
  */
 export function logSignalEvent(event: Record<string, unknown>): void {
+  // With the retrieval ledger in force (strict, or strict but misconfigured) the local JSONL log is NOT written: the ledger
+  // is the record, and there is no persistent file mirror. Only "off" keeps the legacy log. (Doctrine D10.)
+  if (getLedgerConfig().mode !== "off") return;
   try {
     const dir = path.join(config.vault.root, "_signals");
     fs.mkdirSync(dir, { recursive: true });
@@ -121,6 +128,7 @@ export async function saveRawSignal(input: RawSignalInput): Promise<{ uuid: stri
         engine: input.engine,
         retrieved_at: input.retrievedAt,
         observed_at: observedAt,
+        ...(input.retrievalId ? { retrieval_id: input.retrievalId } : {}),
       },
     },
     { institutional: true },
@@ -136,10 +144,22 @@ function safeSaveError(err: unknown): string {
   return r.count === 0 && isClean(text) && text.length <= 200 ? text : "archive failed (details withheld by policy)";
 }
 
+function stageOf(err: SanitizationFailure): Stage {
+  return (STAGES as readonly string[]).includes(err.stage) ? (err.stage as Stage) : "response";
+}
+
+/** Closed classification of an archive failure, from typed errors only (never from message text). */
+function archiveErrorCode(err: unknown): ArchiveErrorCode {
+  if (err instanceof ArtifactMirrorError) return "archive_mirror";
+  if (err instanceof ArtifactWriteError) return "archive_write";
+  return "archive_unknown";
+}
+
 /**
  * Log the retrieval FIRST, then optionally archive it. A failed archive never discards the retrieval record.
  * `sanitization_failed` tells the caller that redaction could not be verified, so the response must be
  * withheld as well: a failed sanitization never makes the unsanitized response safe to return.
+ * `sanitization_stage` and `archive_error_code` are closed values the ledger writer records; they are null on success.
  */
 export async function recordRetrieval(
   input: RawSignalInput & { save: boolean },
@@ -148,8 +168,10 @@ export async function recordRetrieval(
   saved: { uuid: string; hash: string } | null;
   save_error: string | null;
   sanitization_failed: boolean;
+  sanitization_stage: Stage | null;
+  archive_error_code: ArchiveErrorCode | null;
 }> {
-  const retrievalId = randomUUID();
+  const retrievalId = input.retrievalId ?? randomUUID();
   const base = {
     retrieval_id: retrievalId,
     provider: input.provider,
@@ -157,16 +179,25 @@ export async function recordRetrieval(
     params: withoutKey(input.params),
   };
   logSignalEvent({ event: "retrieved", ...base, retrieved_at: input.retrievedAt, save_requested: input.save });
-  if (!input.save) return { retrieval_id: retrievalId, saved: null, save_error: null, sanitization_failed: false };
+  if (!input.save) {
+    return { retrieval_id: retrievalId, saved: null, save_error: null, sanitization_failed: false, sanitization_stage: null, archive_error_code: null };
+  }
 
   try {
-    const saved = await saveRawSignal(input);
+    const saved = await saveRawSignal({ ...input, retrievalId });
     logSignalEvent({ event: "save_ok", retrieval_id: retrievalId, saved_uuid: saved.uuid, hash: saved.hash });
-    return { retrieval_id: retrievalId, saved, save_error: null, sanitization_failed: false };
+    return { retrieval_id: retrievalId, saved, save_error: null, sanitization_failed: false, sanitization_stage: null, archive_error_code: null };
   } catch (err) {
     const message = safeSaveError(err);
     const failed = err instanceof SanitizationFailure;
     logSignalEvent({ event: failed ? "sanitization_failed" : "save_failed", retrieval_id: retrievalId, error: message });
-    return { retrieval_id: retrievalId, saved: null, save_error: message, sanitization_failed: failed };
+    return {
+      retrieval_id: retrievalId,
+      saved: null,
+      save_error: message,
+      sanitization_failed: failed,
+      sanitization_stage: failed ? stageOf(err as SanitizationFailure) : null,
+      archive_error_code: failed ? null : archiveErrorCode(err),
+    };
   }
 }

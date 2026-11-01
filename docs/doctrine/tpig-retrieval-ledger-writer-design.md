@@ -1,6 +1,11 @@
 # TPIG Retrieval Ledger: Writer Design
 
-**Status:** DESIGN ONLY, for Founder review. Nothing here is implemented, activated or wired. No production write, provider call, legacy import or deletion is part of this phase.
+**Status:** IMPLEMENTED (2026-10-31) behind `BLUME_LEDGER_MODE=off` by default, NOT activated. W1-W12 ratified by the Founder with three refinements: (1) identical frozen-event retries only; (2) archive/ledger discrepancies must remain detectable; (3) no automatic strict-to-off fallback. Operations: `docs/runbooks/ledger-operations.md`. No production write, provider call, legacy import or deletion occurred.
+
+**Implementation deviations from section 12 (recorded, none weakens a decision):**
+- The `clock` failure class is folded into `validation`: the client reads only HTTP status and SQLSTATE, never messages, so a clock rejection is indistinguishable from an allowlist violation and is equally HARD.
+- `src/config.ts` and `mcp/server.ts` are unchanged: the `ledger` summary is returned inside the serp/trends tool outputs.
+- Two support modules were added beyond the seven planned: `ledger/index.ts` (entry point and test seams) and `ledger/reconcile.ts` (read-only reconciliation helpers used by the CLI).
 **Date:** 2026-11-01
 **Builds on:** `tpig-retrieval-ledger.md` (doctrine), `tpig-query-and-pii-policy.md` (Correction 6), and the deployed migration `20261031221514` in `revenue-core-infra` (**not modified by this work**).
 **Contract it writes against:** `public.thq_append_retrieval_event(p jsonb) returns text` (verified on production: `SECURITY DEFINER`, executable by `service_role`, not by `anon`). The writer never uses direct `INSERT`.

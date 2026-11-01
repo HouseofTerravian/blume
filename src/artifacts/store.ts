@@ -38,20 +38,39 @@ function ensureDir(dir: string): void {
  * so ingest does not report success until the row is in live `thq_artifacts`. The local copy is
  * written first and preserved regardless. When Supabase is disabled, local-only (fallback preserved).
  */
+/** The local write-once file could not be written. Same message as the underlying error; typed so callers can classify it. */
+export class ArtifactWriteError extends Error {
+  constructor(cause: unknown) {
+    super(cause instanceof Error ? cause.message : "artifact local write failed");
+    this.name = "ArtifactWriteError";
+    (this as { cause?: unknown }).cause = cause;
+  }
+}
+
+/** The live thq_artifacts mirror did not succeed (the local copy was preserved). */
+export class ArtifactMirrorError extends Error {
+  constructor(uuid: string) {
+    super(`artifact mirror failed: write to live thq_artifacts did not succeed (uuid=${uuid}). Local copy preserved.`);
+    this.name = "ArtifactMirrorError";
+  }
+}
+
 export async function persistArtifact(a: Artifact): Promise<void> {
   const dir = brandDir(a.brand);
-  ensureDir(dir);
   // Raw signals are write-once: exclusive-create locally, insert-only in Supabase.
   const immutable = isRawSignal(a);
-  fs.writeFileSync(path.join(dir, `${a.uuid}.json`), JSON.stringify(a, null, 2), {
-    encoding: "utf-8",
-    flag: immutable ? "wx" : "w",
-  });
+  try {
+    ensureDir(dir);
+    fs.writeFileSync(path.join(dir, `${a.uuid}.json`), JSON.stringify(a, null, 2), {
+      encoding: "utf-8",
+      flag: immutable ? "wx" : "w",
+    });
+  } catch (err) {
+    throw new ArtifactWriteError(err);
+  }
   if (isSupabaseEnabled()) {
     const saved = await dbSaveArtifact(a, { insertOnly: immutable });
-    if (saved === null) {
-      throw new Error(`artifact mirror failed: write to live thq_artifacts did not succeed (uuid=${a.uuid}). Local copy preserved.`);
-    }
+    if (saved === null) throw new ArtifactMirrorError(a.uuid);
   }
 }
 
