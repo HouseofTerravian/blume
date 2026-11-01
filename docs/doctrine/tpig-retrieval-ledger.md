@@ -1,6 +1,6 @@
 # TPIG Retrieval Ledger
 
-**Status:** DRAFT for Founder review. Conditionally ratified design decisions (Correction 5, 2026-10-31). The migration now INTEGRATES the remediation (R1-R5) from the 2026-10-31 pre-deployment security gate and has been re-tested in its final form and mutation-tested. It is still NOT applied to any database, and no retrieval path is wired.
+**Status:** The ledger migration (`20261031221514`, accepted at `301d2cb`) was **APPLIED to production `revenue-core` on 2026-11-01 and verified** (16 of 16 checks; evidence `revenue-core-infra/audit/deploy/20261101-ledger-deployment-evidence.md`). The ledger is **empty**: no writer exists and no retrieval path is wired. Operational launch remains blocked on the writer, O3 (backups) and O5 (retention).
 **Schema version:** `tpig-ledger-1`
 **Owners:** `revenue-core-infra` owns the table, constraints, triggers, privileges and reconciliation view (migration `20261031221514_thq_retrieval_events_ledger.sql`). BLUME owns this doctrine, the event contract and, later, the writer. TerravianHQ and ASSIST are read-only consumers.
 **Governance:** operates under TPIG (provisional): "Every retrieval and transformation shall be logged"; "Maintain immutable histories of retrieval"; "minimize unnecessary retention of personal data". Preserves `tpig-query-policy-1` and `tpig-sanitize-2` (see `tpig-query-and-pii-policy.md`) and the write-once raw-signal guards.
@@ -280,3 +280,11 @@ Gate report: `revenue-core-infra/audit/predeploy/20261031-ledger-security-gate.m
 6. Rollback is `DROP` of the objects listed in the migration header, valid only while the table is empty.
 
 **Not prerequisites for applying an empty table, but blockers for operational launch:** the writer built to the rules above with its own tests; O3 (a restorable backup or a compensating checkpoint; PITR is off and no restorable backup is listed); O5 (a ratified retention schedule).
+
+## 19. Deployment record (2026-11-01)
+
+- **Applied once**, by the Founder, through the gated scripted flow (`revenue-core-infra/scripts/deploy/`): preflight PRE-1 to PRE-7 all passed; history went from `20261031192720:76` to `20261031221514:77`; no error, no rollback.
+- **Verified read-only:** RLS on with no policies; `service_role` holds `SELECT` only; exactly 8 functions, one `SECURITY DEFINER` pinned to `pg_catalog, pg_temp`; `EXECUTE` held by `service_role` on the append and row-hash functions only; exactly 5 triggers, all enabled; **zero rows**; reconciliation view readable with only `pre_ledger_artifact` (c0dc83b0); the ledger is in no publication; the structural fingerprint equals the tested migration's on all four components.
+- **One verifier defect found and fixed** (not a deployment defect): the first V11 run failed because the CLI treats a leading `--` argument as a flag, and because Postgres 18 (test cluster) lists `NOT NULL` as constraint rows that Postgres 17.6 (production) does not. The fingerprint now excludes `NOT NULL` constraint rows (they are covered by the column definitions) and the expected value was recomputed from the tested migration and matched production independently.
+- **Unchanged and still open:** the writer is not built (nothing writes to the ledger); **O3** backups (PITR off, no restorable backup listed, plan tier not exposed); **O5** retention schedule unresolved (retention indefinite). The writer must follow the rules in section 3 and section 18.
+- **Known documentation defect:** the migration header's `ROLLBACK:` list drops the table before the row-hash function, which fails; the tested rollback template (`scripts/deploy/rollback/`) has the correct order. The header was left as accepted.
